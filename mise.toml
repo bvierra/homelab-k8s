@@ -1,0 +1,4 @@
+[tools]
+kubeconform = "latest"
+kustomize = "latest"
+yq = "latest"
