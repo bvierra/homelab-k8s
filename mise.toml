@@ -1,4 +1,5 @@
 [tools]
 kubeconform = "latest"
 kustomize = "latest"
+task = "latest"
 yq = "latest"

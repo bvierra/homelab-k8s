@@ -1,0 +1,18 @@
+---
+version: "3"
+
+env:
+  KUBECONFIG: "{{ .HOME }}/.kube/config"
+
+set: [pipefail]
+shopt: [globstar]
+
+tasks:
+  default: task --list
+
+  reconcile:
+    desc: Force Flux to pull in changes from your Git repository
+    cmd: flux --namespace flux-system reconcile kustomization flux-system --with-source
+    preconditions:
+      - test -f {{.KUBECONFIG}}
+      - which flux
