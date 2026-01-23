@@ -8,7 +8,7 @@ spec:
   decryption:
     provider: sops
     secretRef:
-      name: sops-age.flux-system
+      name: sops-age
   deletionPolicy: WaitForTermination
   interval: 10m0s
   prune: true
@@ -29,7 +29,7 @@ spec:
           decryption:
             provider: sops
             secretRef:
-              name: sops-age.flux-system
+              name: sops-age
           deletionPolicy: WaitForTermination
           patches:
             - patch: |-
