@@ -1,0 +1,283 @@
+nameOverride: ""
+fullnameOverride: ""
+extraCaCerts:
+driver:
+  existingConfigSecret:
+  config:
+    driver: freenas-api-nfs
+    instance_id: null
+    httpConnection:
+      protocol: https
+      host: ${TRUENAS_IP}
+      port: 443
+      allowInsecure: true
+      apiKey: "${TRUENAS_API_KEY}"
+      username: "${TRUENAS_USERNAME}"
+    zfs:
+      datasetParentName: General/k8s/NFS/vol
+      detachedSnapshotsDatasetParentName: General/k8s/NFS/snaps
+      datasetEnableQuotas: true
+      datasetEnableReservation: false
+      datasetPermissionsMode: "0777"
+      datasetPermissionsUser: 3001
+      datasetPermissionsGroup: 3001
+      datasetProperties:
+        "org.freenas:description": "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
+    nfs:
+      shareCommentTemplate: "{{ parameters.[csi.storage.k8s.io/pvc/namespace] }}/{{ parameters.[csi.storage.k8s.io/pvc/name] }}"
+      shareHost: ${NFS_SERVER_IP}
+      shareAlldirs: false
+      shareAllowedNetworks:
+        - 10.10.140.0/24
+        - 10.10.130.0/24
+      shareMapallUser: ${TRUENAS_USERNAME}
+      shareMapallGroup: ${TRUENAS_USERNAME}
+csiDriver:
+  name: "org.democratic-csi.nfs"
+  version: 1.5.0
+  enabled: true
+  attachRequired: true
+  podInfoOnMount: true
+
+controller:
+  enabled: true
+  rbac:
+    enabled: true
+    openshift:
+      privileged: false
+  replicaCount: 1
+  hostNetwork: false
+  dnsPolicy: ClusterFirst
+  hostAliases: []
+  hostIPC: false
+  annotations: {}
+  labels: {}
+  podAnnotations: {}
+  podLabels: {}
+  priorityClassName: "system-cluster-critical"
+
+  # deployment = deploy controller parts in a distinct deployment
+  # node       = deploy controller as sidecars with node daemonset
+  strategy: deployment
+
+  # https://kubernetes-csi.github.io/docs/external-attacher.html
+  externalAttacher:
+    enabled: true
+    image:
+      registry: registry.k8s.io/sig-storage/csi-attacher
+      tag: v4.4.0
+    args:
+      - --v={{ .Values.controller.externalAttacher.verbosityLevel }}
+      - --leader-election
+      - --leader-election-namespace={{ .Release.Namespace }}
+      - --timeout=90s
+      - --worker-threads=10
+      - --csi-address={{ .csiSocketAddress }}
+    extraArgs: []
+    resources:
+    verbosityLevel: 5
+
+  # https://kubernetes-csi.github.io/docs/external-provisioner.html
+  externalProvisioner:
+    enabled: true
+    image:
+      registry: registry.k8s.io/sig-storage/csi-provisioner
+      tag: v3.6.0
+    args:
+      - --v={{ .Values.controller.externalProvisioner.verbosityLevel }}
+      - --leader-election
+      - --leader-election-namespace={{ .Release.Namespace }}
+      - --timeout=90s
+      - --worker-threads=10
+      - --extra-create-metadata
+      - --csi-address={{ .csiSocketAddress }}
+    extraArgs: []
+    resources:
+    verbosityLevel: 5
+
+  # https://kubernetes-csi.github.io/docs/external-resizer.html
+  externalResizer:
+    enabled: true
+    image:
+      registry: registry.k8s.io/sig-storage/csi-resizer
+      tag: v1.9.0
+    args:
+      - --v={{ .Values.controller.externalResizer.verbosityLevel }}
+      - --leader-election
+      - --leader-election-namespace={{ .Release.Namespace }}
+      - --timeout=90s
+      - --workers=10
+      - --csi-address={{ .csiSocketAddress }}
+    extraArgs: []
+    resources:
+    verbosityLevel: 5
+
+  # https://kubernetes-csi.github.io/docs/external-snapshotter.html
+  externalSnapshotter:
+    enabled: true
+    image:
+      registry: registry.k8s.io/sig-storage/csi-snapshotter
+      tag: v8.2.1
+    args:
+      - --v={{ .Values.controller.externalSnapshotter.verbosityLevel }}
+      - --leader-election
+      - --leader-election-namespace={{ .Release.Namespace }}
+      - --timeout=90s
+      - --worker-threads=10
+      - --csi-address={{ .csiSocketAddress }}
+    extraArgs: []
+    resources:
+    verbosityLevel: 5
+
+  # https://github.com/kubernetes-csi/external-health-monitor
+  externalHealthMonitorController:
+    enabled: false
+    image:
+      registry: registry.k8s.io/sig-storage/csi-external-health-monitor-controller
+      tag: v0.14.0
+    args:
+      - --v={{ .Values.controller.externalHealthMonitorController.verbosityLevel }}
+      - --leader-election
+      - --leader-election-namespace={{ .Release.Namespace }}
+      - --timeout=90s
+      - --worker-threads=10
+      - --csi-address={{ .csiSocketAddress }}
+    #- --enable-node-watcher
+    #- --list-volumes-interval
+    extraArgs: []
+    resources:
+    verbosityLevel: 5
+
+  extraContainers: []
+
+  livenessProbe:
+    enabled: true
+
+  driver:
+    enabled: true
+    image:
+      registry: ghcr.io/democratic-csi/democratic-csi
+      tag: latest
+    logLevel: info
+    lifecycle:
+    securityContext:
+    resources:
+    extraEnv: []
+    extraVolumeMounts: []
+
+  extraVolumes: []
+  nodeSelector: {}
+  tolerations: []
+  topologySpreadConstraints: []
+  affinity: {}
+
+node:
+  windows:
+    enabled: false
+  linux:
+    enabled: true
+  rbac:
+    enabled: true
+    openshift:
+      privileged: false
+  enabled: true
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  hostAliases: []
+  hostIPC: true
+  hostPID: true
+  kubeletHostPath: /var/lib/kubelet
+  annotations: {}
+  labels: {}
+  podAnnotations: {}
+  podLabels: {}
+  priorityClassName: "system-node-critical"
+
+  livenessProbe:
+    enabled: true
+
+  cleanup:
+    image:
+      registry: docker.io/busybox
+      tag: 1.37.0
+    resources:
+
+  driver:
+    enabled: true
+    image:
+      registry: ghcr.io/democratic-csi/democratic-csi
+      tag: latest
+    logLevel: info
+    localtimeHostPath: /etc/localtime
+    lifecycle:
+
+    resources:
+    extraEnv:
+      - name: ISCSIADM_HOST_STRATEGY
+        value: nsenter
+      - name: ISCSIADM_HOST_PATH
+        value: /usr/local/sbin/iscsiadm
+    iscsiDirHostPath: /usr/local/etc/iscsi
+    iscsiDirHostPathType: ""
+    extraVolumeMounts: []
+    nvmeDirMountEnabled: false
+
+  # https://kubernetes-csi.github.io/docs/node-driver-registrar.html
+  driverRegistrar:
+    enabled: true
+    image:
+      registry: registry.k8s.io/sig-storage/csi-node-driver-registrar
+      tag: v2.9.0
+    args:
+      - --v={{ .Values.node.driverRegistrar.verbosityLevel }}
+      - --csi-address={{ .csiSocketAddress }}
+      - --kubelet-registration-path={{ .Values.node.kubeletHostPath }}/plugins/{{ .Values.csiDriver.name }}/csi.sock
+    extraArgs: []
+    resources:
+    verbosityLevel: 5
+
+  extraVolumes: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+storageClasses:
+  - name: freenas-nfs-csi
+    defaultClass: true
+    reclaimPolicy: Delete
+    volumeBindingMode: Immediate
+    allowVolumeExpansion: true
+    parameters:
+      # for block-based storage can be ext3, ext4, xfs
+      # for nfs should be nfs
+      fsType: nfs
+      detachedVolumesFromSnapshots: "false"
+      detachedVolumesFromVolumes: "false"
+
+    mountOptions:
+      - noatime
+      - nfsvers=4.2
+      - nconnect=8
+
+    secrets:
+      provisioner-secret:
+      controller-publish-secret:
+      node-stage-secret:
+      node-publish-secret:
+      controller-expand-secret:
+
+volumeSnapshotClasses:
+  - name: freenas-nfs-snapclass
+    parameters:
+      detachedSnapshots: "true"
+
+# https://github.com/democratic-csi/csi-grpc-proxy
+csiProxy:
+  enabled: true
+  image:
+    registry: ghcr.io/democratic-csi/csi-grpc-proxy
+    tag: v0.5.7
+  resources:
+
+# Configure a pod security policy to allow privileged pods
+enablePSP: false
