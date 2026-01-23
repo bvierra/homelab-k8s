@@ -24,6 +24,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: democratic-csi
+    namespace: democratic-csi
   install:
     remediation:
       retries: -1
