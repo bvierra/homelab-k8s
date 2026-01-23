@@ -9,6 +9,8 @@ cgroup:
 cni:
   exclusive: false
 devices: "eth0 ens18"
+etcd:
+  clusterDomain: "k8s.vierra.host"
 envoy:
   securityContext:
     capabilities:
