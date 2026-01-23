@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+patches:
+  - target:
+      group: ""
+      version: v1
+      kind: Namespace
+    patch: |-
+      - op: add
+        path: /metadata/labels
+        value:
+              pod-security.kubernetes.io/audit: privileged
+              pod-security.kubernetes.io/enforce: privileged
+              pod-security.kubernetes.io/warn: privileged
