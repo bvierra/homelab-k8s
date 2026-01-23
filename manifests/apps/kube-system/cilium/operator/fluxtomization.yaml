@@ -22,4 +22,4 @@ spec:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: *name
-      namespace: *namespace
+      namespace: kube-system
