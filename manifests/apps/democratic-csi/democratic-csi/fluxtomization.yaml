@@ -13,7 +13,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: democratic-csi
-  path: ./manifests/apps/democratic-csi/democratic-csi/base/kustomization.yaml
+  path: ./manifests/apps/democratic-csi/democratic-csi/base/
   sourceRef:
     kind: GitRepository
     name: flux-system
