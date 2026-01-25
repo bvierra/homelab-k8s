@@ -5,7 +5,6 @@ kind: Kustomization
 namespace: democratic-csi
 components:
   - ../../components/common
-  - ../../components/envsubst
   - ../../components/privileged-namespace
 resources:
   - ./democratic-csi/fluxtomization.yaml
