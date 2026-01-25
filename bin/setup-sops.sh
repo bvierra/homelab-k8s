@@ -59,9 +59,8 @@ export_secret_key_to_k8s() {
     echo "SOPS age key not found at $ARTIFACTS_DIR/sops/server/server.privkey"
     exit 1
   fi
-  check_sops=$(kubectl get secret/sops-age -n flux-system)
-  if [ $? -eq 0 ]; then
-  #if kubectl get secret/sops-age -n flux-system; then
+
+  if [ "$(kubectl get secret/sops-age -n flux-system)" ]; then
     if get_confirmation "Secret sops-age already exists in flux-system namespace. Do you want to overwrite it?"; then
       kubectl delete secret sops-age -n flux-system
     fi
@@ -69,14 +68,27 @@ export_secret_key_to_k8s() {
 
   kubectl create secret generic sops-age \
     --namespace=flux-system \
-    --from-file=age.key="$ARTIFACTS_DIR"/sops/server/server.privkey
+    --from-file=sops.agekey="$ARTIFACTS_DIR"/sops/server/server.privkey
+
+  kubectl annotate \
+    --namespace=flux-system \
+    --overwrite=true \
+    secret sops-age \
+    reflector.v1.k8s.emberstack.com/reflection-allowed="true"
+
+  kubectl annotate \
+    --namespace=flux-system \
+    --overwrite=true \
+    secret sops-age \
+    reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces=""
+
   echo "Secret 'sops-age' created/updated in 'flux-system' namespace"
 }
 
 create_sops_config() {
   local -a pub_keys=()
   for file in "$ARTIFACTS_DIR"/sops/**/*.pubkey; do
-    pub_keys+=("$(cat "$file")")
+    pub_keys+=("$(cat "$file"),")
   done
   PUB_KEY=$(IFS=$'\n'; echo "${pub_keys[*]}" | sed 's/^/      /')
   cat <<EOF > "$ROOT_DIR/.sops.yaml"
@@ -97,23 +109,6 @@ EOF
 delete_sops_keys() {
   rm -rf "$ARTIFACTS_DIR/sops"
 }
-
-
-# case $1 in
-#   generate-key)
-#     generate_key
-#     ;;
-#   save-public-key)
-#     save_public_key
-#     ;;
-#   export-secret-key-to-k8s)
-#     export_secret_key_to_k8s
-#     ;;
-#   *)
-#     echo "Usage: $0 {generate-key|get-fingerprint|get-secret-key}"
-#     exit 1
-#     ;;
-# esac
 
 error() {
   echo "Error: $1"
@@ -136,15 +131,43 @@ get_confirmation() {
   fi
 }
 
+help() {
+  cat << EOF
+Usage: $0 [options]
 
-SHORT_OPTS="cga:fh"
-LONG_OPTS="clean,generate-configs,add-user:,full,force,help"
+The following actions are mutually exclusive; only one can be specified at a time.
+[--clean|--generate-configs|--add-user|--full|--k8s-export-secret]
+
+The --full option will delete any existion SOPS keys, generate a new server key,
+generate a new user key, create the .sops.yaml config file, and export the server
+key to kubernetes.
+
+Adding a user key with --add-user will also regenerate the .sops.yaml config file.
+With the existing server key and all other user keys that have been created.
+
+Options:
+  -c, --clean                 Delete all existing SOPS keys.  This action cannot be undone.
+  -g, --generate-configs      Generate the .sops.yaml configuration file based on existing keys.
+  -a, --add-user [username]   Generate a new user SOPS key. If no username is provided,
+                              a default user key will be created.
+  -f, --full                  Generate a new server and default user SOPS keys,
+                              create the .sops.yaml configuration file, and
+                              export the server key to Kubernetes.
+  -k, --k8s-export-secret     Export the server SOPS key as a secret to
+                              flux-system/sops-age in Kubernetes.
+      --force                 Bypass confirmation prompts for destructive actions.
+  -h, --help                  Display this help message.
+EOF
+}
+
+SHORT_OPTS="cga:fkh"
+LONG_OPTS="clean,generate-configs,add-user:,full,k8s-export-secret,force,help"
 
 OPTS=$(getopt -o "$SHORT_OPTS" --long "$LONG_OPTS" -n "$0" -- "$@")
 
+# shellcheck disable=SC2181
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
-#echo "$OPTS"
 eval set -- "$OPTS"
 
 while true; do
@@ -167,6 +190,10 @@ while true; do
     -f | --full )
       [ -z "$ACTION" ] || error "Only one action can be specified at a time"
       ACTION="full"
+      shift ;;
+    -k | --k8s-export-secret )
+      [ -z "$ACTION" ] || error "Only one action can be specified at a time"
+      ACTION="export-secret"
       shift ;;
     --force)
       FORCE=1;
@@ -209,9 +236,13 @@ case "$ACTION" in
     else
       generate_key "user" "$USERNAME"
     fi
+    create_sops_config
     ;;
   generate-configs)
     create_sops_config
+    ;;
+  export-secret)
+    export_secret_key_to_k8s
     ;;
   *)
     ;;
