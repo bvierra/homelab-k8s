@@ -8,6 +8,8 @@ configMapGenerator:
   - name: cert-manager-values
     files:
       - values.yaml=./helm/values.yaml
+components:
+  - ../../../components/envsubst
 configurations:
   - ./helm/kustomizeconfig.yaml
   - ./referencegrant.yaml

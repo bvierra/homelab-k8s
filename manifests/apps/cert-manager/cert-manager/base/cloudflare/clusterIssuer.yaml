@@ -15,6 +15,9 @@ spec:
             apiTokenSecretRef:
               name: cloudflare-api-token
               key: api-token
+        selector:
+          dnsZones:
+            - "${DOMAIN_0}"
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -32,3 +35,6 @@ spec:
             apiTokenSecretRef:
               name: cloudflare-api-token
               key: api-token
+        selector:
+          dnsZones:
+            - "${DOMAIN_0}"
