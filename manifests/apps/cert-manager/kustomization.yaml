@@ -8,4 +8,4 @@ components:
   - ../../components/envsubst
   - ../../components/privileged-namespace
 resources:
-  - ./cert-manager/kustomization.yaml
+  - ./cert-manager/fluxtomization.yaml
