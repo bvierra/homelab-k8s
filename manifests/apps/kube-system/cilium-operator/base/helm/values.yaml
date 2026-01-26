@@ -23,14 +23,14 @@ gatewayAPI:
   enableAlpn: true
   enableAppProtocol: true
 hubble:
-  enabled: true
+  enabled: false
   peerService:
     clusterDomain: "k8s.vierra.host"
   relay:
-    enabled: true
+    enabled: false
     rollOutPods: true
   ui:
-    enabled: true
+    enabled: false
     rollOutPods: true
 ingressController:
   enabled: true

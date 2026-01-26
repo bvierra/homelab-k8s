@@ -1,5 +1,6 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/helmfile
+# Usage: helmfile -f 01-apps.yaml template -q | kubectl apply --server-side -f -
 
 helmDefaults:
   cleanupOnFail: true

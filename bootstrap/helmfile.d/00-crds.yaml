@@ -14,12 +14,17 @@ helmDefaults:
     - yq ea -e 'select(.kind == "CustomResourceDefinition")' || true
 
 releases:
-  - name: cert-manager-crds
-    namespace: cert-manager
-    chart: oci://quay.io/jetstack/charts/cert-manager
-    version: v1.19.2
-    values:
-      - ../../manifests/apps/cert-manager/cert-manager/base/helm/values.yaml
+  - name: prometheus-operator-crds
+    namespace: monitoring
+    chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
+    version: 26.0.0
+
+  # - name: cert-manager-crds
+  #   namespace: cert-manager
+  #   chart: oci://quay.io/jetstack/charts/cert-manager
+  #   version: v1.19.2
+  #   values:
+  #     - ../../manifests/apps/cert-manager/cert-manager/base/helm/values.yaml
 
   # - name: cilium-crds
   #   namespace: kube-system
