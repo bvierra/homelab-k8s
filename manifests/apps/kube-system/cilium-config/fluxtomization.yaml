@@ -13,7 +13,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: cilium
-  path: ./manifests/apps/kube-system/cilium/config/base
+  path: ./manifests/apps/kube-system/cilium-config/base
   sourceRef:
     kind: GitRepository
     name: flux-system

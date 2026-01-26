@@ -1,0 +1,71 @@
+fullnameOverride: stack
+victoria-metrics-operator:
+  enabled: true
+  env:
+    - name: VM_VMALERTDEFAULT_CONFIGRELOADERCPU
+      value: 0
+    - name: VM_VMAGENTDEFAULT_CONFIGRELOADERCPU
+      value: 0
+    - name: VM_VMALERTMANAGER_CONFIGRELOADERCPU
+      value: 0
+  operator:
+    disable_prometheus_converter: false # Ensure we keep enabled the converter to sync prom rules to VM rules
+    enable_converter_ownership: true # Required to allow VM to remove VM rules it imports if a prometheus rule is delete
+    defaultDashboards:
+      enabled: true
+      grafanaOperator:
+        # -- Create dashboards as CRDs (requires grafana-operator to be installed)
+        enabled: false
+
+    defaultRules:
+      create: true
+      rules:
+        # Disabled because KEDA NFS scalers intentionally run at maxReplicaCount=1
+        # See PR #5092 - this is expected behavior, not a scaling issue
+        KubeHpaMaxedOut:
+          create: false
+      groups:
+        k8sContainerMemorySwap:
+          create: false
+        # Disabled because kube-scheduler metrics produce no useful data
+        # (scheduler is mostly idle, histogram_quantile returns empty results)
+        kubeScheduler:
+          create: false
+
+    vmsingle:
+      enabled: true
+      spec:
+        # -- Data retention period. Possible units character: h(ours), d(ays), w(eeks), y(ears), if no unit character specified - month. The minimum retention period is 24h. See these [docs](https://docs.victoriametrics.com/single-server-victoriametrics/#retention)
+        retentionPeriod: "3"
+        replicaCount: 1
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 60Gi
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            cpu: 530m
+            memory: 1.2Gi
+
+      route:
+        enabled: true
+        annotations:
+          external-dns.alpha.kubernetes.io/internal: "true"
+          external-dns.alpha.kubernetes.io/target: "10.0.6.151"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+        hostnames:
+          - vm.eviljungle.com
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /
+            backendRefs:
+              - name: vmsingle-stack
+                port: 8428
