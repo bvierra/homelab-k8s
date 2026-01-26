@@ -1,0 +1,18 @@
+{% for namespace in ["flux-system", "monitoring"] %}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ namespace }}
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+    reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+    reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ""
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sops-age
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflects: "flux-system/sops-age"
+{% endfor %}

@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/helmfile
+#
+# CRD-only extraction helmfile
+# Usage: helmfile -f 00-crds.yaml template -q | kubectl apply --server-side -f -
+
+helmDefaults:
+  args:
+    - --include-crds
+    - --no-hooks
+  postRenderer: bash
+  postRendererArgs:
+    - -c
+    - yq ea -e 'select(.kind == "CustomResourceDefinition")' || true
+
+releases:
+  - name: cert-manager-crds
+    namespace: cert-manager
+    chart: oci://quay.io/jetstack/charts/cert-manager
+    version: v1.19.2
+    values:
+      - ../../manifests/apps/cert-manager/cert-manager/base/helm/values.yaml
+
+  # - name: cilium-crds
+  #   namespace: kube-system
+  #   chart: oci://quay.io/cilium/charts/cilium
+  #   version: 1.18.6
+  #   values:
+  #     - ../../manifests/apps/kube-system/cilium/operator/base/helm/values.yaml
