@@ -6,4 +6,3 @@ namespace: kube-system
 resources:
   - ./cilium-operator/fluxtomization.yaml
   - ./cilium-config/fluxtomization.yaml
-  - ./coredns/fluxtomization.yaml
