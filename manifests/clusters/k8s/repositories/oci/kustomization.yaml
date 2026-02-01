@@ -4,5 +4,7 @@ kind: Kustomization
 resources:
   - ./cilium.yaml
   - ./democratic-csi.yaml
+  - ./emberstack.yaml
   - ./jetstack.yaml
   - ./prometheus-community.yaml
+  - ./victoriametrics.yaml
