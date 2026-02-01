@@ -5,6 +5,3 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - ./kubernetes-reflector/fluxtomization.yaml
-  - ./flux-operator/fluxtomization.yaml
-
-  - ./flux-instance/fluxtomization.yaml
