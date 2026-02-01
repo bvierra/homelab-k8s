@@ -1,18 +1,4 @@
 ---
-# yaml-language-server: $schema=https://schemas.budimanjojo.com/source.toolkit.fluxcd.io/ocirepository_v1beta2.json
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: OCIRepository
-metadata:
-  name: democratic-csi
-spec:
-  interval: 15m
-  url: oci://ghcr.io/democratic-csi/charts/democratic-csi
-  ref:
-    tag: 0.15.1
-  layerSelector:
-    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
-    operation: copy
----
 # yaml-language-server: $schema=https://schemas.budimanjojo.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -24,10 +10,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: democratic-csi
-    namespace: democratic-csi
-  install:
-    remediation:
-      retries: -1
+    namespace: flux-system
   upgrade:
     cleanupOnFail: true
     remediation:

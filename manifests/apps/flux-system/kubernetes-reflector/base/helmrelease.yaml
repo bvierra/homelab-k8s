@@ -11,9 +11,6 @@ spec:
     kind: OCIRepository
     name: emberstack
     namespace: flux-system
-  install:
-    remediation:
-      retries: -1
   upgrade:
     cleanupOnFail: true
     remediation:

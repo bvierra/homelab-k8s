@@ -1,18 +1,4 @@
 ---
-# yaml-language-server: $schema=https://schemas.budimanjojo.com/source.toolkit.fluxcd.io/ocirepository_v1beta2.json
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: OCIRepository
-metadata:
-  name: victoriametrics-operator-crds
-spec:
-  interval: 15m
-  url: oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-operator
-  ref:
-    tag: 0.67.0
-  layerSelector:
-    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
-    operation: copy
----
 # yaml-language-server: $schema=https://schemas.budimanjojo.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,7 +9,7 @@ spec:
   timeout: 5m
   chartRef:
     kind: OCIRepository
-    name: victoriametrics-operator-crds
+    name: victoriametrics
     namespace: monitoring
   install:
     remediation:

@@ -1,18 +1,4 @@
 ---
-# yaml-language-server: $schema=https://schemas.budimanjojo.com/source.toolkit.fluxcd.io/ocirepository_v1beta2.json
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: OCIRepository
-metadata:
-  name: prometheus-operator-crds
-spec:
-  interval: 15m
-  url: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
-  ref:
-    tag: 26.0.0
-  layerSelector:
-    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
-    operation: copy
----
 # yaml-language-server: $schema=https://schemas.budimanjojo.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,8 +9,8 @@ spec:
   timeout: 5m
   chartRef:
     kind: OCIRepository
-    name: prometheus-operator-crds
-    namespace: monitoring
+    name: prometheus-community
+    namespace: kube-system
   install:
     remediation:
       retries: -1
