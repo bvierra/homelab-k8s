@@ -9,6 +9,7 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
+      namespace: flux-system
   deletionPolicy: WaitForTermination
   interval: 30m0s
   prune: true
