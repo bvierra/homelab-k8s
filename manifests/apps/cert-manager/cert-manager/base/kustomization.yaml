@@ -11,8 +11,6 @@ resources:
   - ./cloudflare/secret.sops.yaml
   - ./cloudflare/clusterIssuer.yaml
   - ./cloudflare/wildcard-certificate.yaml
-components:
-  - ../../../../components/envsubst
 configMapGenerator:
   - name: cert-manager-values
     files:

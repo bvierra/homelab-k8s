@@ -9,8 +9,6 @@ cgroup:
 cni:
   exclusive: false
 devices: "eth0 ens18"
-etcd:
-  clusterDomain: "k8s.vierra.host"
 envoy:
   securityContext:
     capabilities:
@@ -24,8 +22,6 @@ gatewayAPI:
   enableAppProtocol: true
 hubble:
   enabled: false
-  peerService:
-    clusterDomain: "k8s.vierra.host"
   relay:
     enabled: false
     rollOutPods: true

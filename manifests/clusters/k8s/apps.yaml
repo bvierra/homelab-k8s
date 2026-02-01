@@ -10,13 +10,19 @@ spec:
     secretRef:
       name: sops-age
   deletionPolicy: WaitForTermination
-  interval: 10m0s
+  interval: 30m0s
   prune: true
   path: ./manifests/apps
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: cluster-settings
+      - kind: Secret
+        name: cluster-secrets
   wait: false
   patches:
     # add Kustomization defaults for all child Kustomizations
@@ -30,6 +36,12 @@ spec:
             provider: sops
             secretRef:
               name: sops-age
+          postBuild:
+            substituteFrom:
+              - kind: ConfigMap
+                name: cluster-settings
+              - kind: Secret
+                name: cluster-secrets
           deletionPolicy: WaitForTermination
           patches:
             - patch: |-
@@ -42,6 +54,8 @@ spec:
                     crds: CreateReplace
                     strategy:
                       name: RetryOnFailure
+                    remediation:
+                      tries: 3
                   rollback:
                     cleanupOnFail: true
                     recreate: true
@@ -52,7 +66,10 @@ spec:
                       name: RemediateOnFailure
                     remediation:
                       remediateLastFailure: true
-                      retries: 2
+                      retries: 3
+                  uninstall:
+                    keepHistory: true
+                  maxHistory: 3
               target:
                 group: helm.toolkit.fluxcd.io
                 kind: HelmRelease

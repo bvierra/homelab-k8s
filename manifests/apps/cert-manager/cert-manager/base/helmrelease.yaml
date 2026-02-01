@@ -1,18 +1,4 @@
 ---
-# yaml-language-server: $schema=https://schemas.budimanjojo.com/source.toolkit.fluxcd.io/ocirepository_v1beta2.json
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: OCIRepository
-metadata:
-  name: cert-manager
-spec:
-  interval: 15m
-  url: oci://quay.io/jetstack/charts/cert-manager
-  ref:
-    tag: v1.19.2
-  layerSelector:
-    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
-    operation: copy
----
 # yaml-language-server: $schema=https://schemas.budimanjojo.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,15 +9,8 @@ spec:
   timeout: 5m
   chartRef:
     kind: OCIRepository
-    name: cert-manager
-    namespace: cert-manager
-  install:
-    remediation:
-      retries: -1
-  upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 5
+    name: jetstack
+    namespace: flux-system
   valuesFrom:
     - kind: ConfigMap
       name: cert-manager-values

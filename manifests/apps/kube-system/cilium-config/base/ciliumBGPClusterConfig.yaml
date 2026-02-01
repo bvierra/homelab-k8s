@@ -4,12 +4,12 @@ metadata:
   name: cilium-bgp
 spec:
   bgpInstances:
-    - name: "instance-64513"
-      localASN: 64513
+    - name: "instance-${ASN_LOCAL}"
+      localASN: ${ASN_LOCAL}
       localPort: 179
       peers:
         - name: "r0"
-          peerAddress: "10.10.130.1"
-          peerASN: 64512
+          peerAddress: "${BGP_PEER_ADDRESS}"
+          peerASN: ${ASN_PEER}
           peerConfigRef:
             name: "cilium-peer"
