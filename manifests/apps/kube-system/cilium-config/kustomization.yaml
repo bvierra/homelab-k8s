@@ -16,7 +16,7 @@ spec:
   path: ./manifests/apps/kube-system/cilium-config/base
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: homelab
     namespace: flux-system
   wait: true
   dependsOn:

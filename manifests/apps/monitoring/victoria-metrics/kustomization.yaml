@@ -16,5 +16,5 @@ spec:
   path: ./manifests/apps/monitoring/victoria-metrics/base/
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: homelab
     namespace: flux-system
