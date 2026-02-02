@@ -1,0 +1,25 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cert-manager
+  namespace: flux-system
+spec:
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  deletionPolicy: WaitForTermination
+  interval: 30m0s
+  prune: true
+  path: ./manifests/apps/cert-manager/cert-manager
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+    namespace: flux-system
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: cluster-settings
+      - kind: Secret
+        name: cluster-secrets
+  wait: false
