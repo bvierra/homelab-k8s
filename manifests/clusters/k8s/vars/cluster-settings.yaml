@@ -4,6 +4,9 @@ kind: ConfigMap
 metadata:
   name: cluster-settings
   namespace: flux-system
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+    reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ""
 data:
   TIMEZONE: "America/Los_Angeles"
   KUBE_VIP_ADDR: "10.10.130.100"
