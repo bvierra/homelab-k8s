@@ -10,7 +10,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: victoriametrics
-    namespace: monitoring
+    namespace: flux-system
   install:
     remediation:
       retries: -1

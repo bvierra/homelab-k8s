@@ -10,7 +10,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: prometheus-community
-    namespace: kube-system
+    namespace: flux-system
   install:
     remediation:
       retries: -1
