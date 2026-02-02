@@ -6,5 +6,6 @@ metadata:
   name: apps-kube-system-kustomization
 namespace: kube-system
 resources:
+  - ./replicated-resources.yaml
   - ./cilium-operator/kustomization.yaml
   - ./cilium-config/kustomization.yaml
