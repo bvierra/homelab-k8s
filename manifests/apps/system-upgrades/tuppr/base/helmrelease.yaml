@@ -9,6 +9,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: home-operations
+    namespace: flux-system
   interval: 30m
   values:
     replicaCount: 1

@@ -4,7 +4,6 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: home-operations
-  namespace: system-upgrade
 spec:
   interval: 30m
   layerSelector:
