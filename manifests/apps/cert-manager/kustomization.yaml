@@ -6,4 +6,4 @@ namespace: cert-manager
 components:
   - ../../components/namespace
 resources:
-  - ./cert-manager/fluxtomization.yaml
+  - ./cert-manager/kustomization.yaml

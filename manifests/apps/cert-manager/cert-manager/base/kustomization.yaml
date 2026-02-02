@@ -6,9 +6,9 @@ metadata:
   name: cert-manager
   namespace: cert-manager
 resources:
+  - ./cloudflare/secret.sops.yaml
   - ./helmrelease.yaml
   - ./referencegrant.yaml
-  - ./cloudflare/secret.sops.yaml
   - ./cloudflare/clusterIssuer.yaml
   - ./cloudflare/wildcard-certificate.yaml
 configMapGenerator:
