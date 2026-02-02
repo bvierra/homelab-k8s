@@ -6,4 +6,4 @@ metadata:
 spec:
   allowFirstLastIPs: "No"
   blocks:
-    - cidr: ${LB_CIDR}
+    - cidr: 10.11.100.0/24
