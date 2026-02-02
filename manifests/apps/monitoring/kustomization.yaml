@@ -10,4 +10,3 @@ components:
 resources:
   - ./prometheus-operator-crds/kustomization.yaml
   - ./victoria-metrics/kustomization.yaml
-  - ./victoriametrics-operator-crds/kustomization.yaml
