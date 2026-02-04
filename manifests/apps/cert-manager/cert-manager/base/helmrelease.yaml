@@ -6,12 +6,19 @@ metadata:
   name: cert-manager
   namespace: cert-manager
 spec:
-  interval: 1h
-  timeout: 5m
   chartRef:
     kind: OCIRepository
     name: jetstack
     namespace: flux-system
+  interval: 10m
+  install:
+    crds: CreateReplace
+    strategy:
+      name: RetryOnFailure
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+  timeout: 5m
   valuesFrom:
     - kind: ConfigMap
       name: cert-manager-values
