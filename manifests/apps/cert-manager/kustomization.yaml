@@ -5,6 +5,8 @@ kind: Kustomization
 metadata:
   name: apps-cert-manager
   namespace: cert-manager
+  labels:
+    manifests.vierra.host/file-location: manifests/apps/cert-manager/kustomization.yaml
 namespace: cert-manager
 components:
   - ../../components/namespace
