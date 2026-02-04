@@ -1,0 +1,16 @@
+---
+version: "3"
+
+set: [pipefail]
+shopt: [globstar]
+
+tasks:
+  create-backend:
+    desc: Setup MinIO backend user
+    cmds:
+      - tofu apply -auto-approve
+    dir: "{{.BOOTSTRAP_DIR}}/tofu/minio"
+    preconditions:
+      - which tofu
+      - sh: "test ! -f backend.tf"
+        msg: "Backend already exists. To recreate, delete backend.tf first."

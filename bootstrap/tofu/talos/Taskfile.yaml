@@ -1,0 +1,53 @@
+---
+version: "3"
+
+set: [pipefail]
+shopt: [globstar]
+
+vars:
+  PARALLEL_APPLY: 1
+  PARALLEL_DESTROY: 4
+
+tasks:
+  default: task --list
+
+  apply:
+    desc: Create Talos infrastructure
+    cmds:
+      - tofu apply -auto-approve -parallelism={{.PARALLEL_APPLY}}
+    preconditions:
+      - which tofu
+      - sh: "test -f backend.tf"
+        msg: "Backend storage config file does not exist. Please run 'task FIXME' first."
+
+  destroy:
+    desc: Destroy Talos infrastructure
+    cmds:
+      - tofu destroy -auto-approve -parallelism={{.PARALLEL_DESTROY}}
+    preconditions:
+      - sh: "test -f backend.tf"
+        msg: "Backend does not exist. Nothing to destroy."
+
+  recreate:
+    desc: Destroy and recreate Talos infrastructure
+    cmds:
+      - task: destroy
+      - sleep 5
+      - task: apply
+      - task: notify
+        vars:
+          {
+            AT: "pass",
+            TITLE: "Talos infrastructure recreated",
+            MESSAGE: "Talos infrastructure has been destroyed and recreated successfully.",
+          }
+
+  notify:
+    desc: Send a notification that Talos infrastructure has been created
+    vars:
+      AT: '{{ default "none" .AT }}'
+      TOPIC: '{{ default "k8s" .TOPIC }}'
+      TITLE: '{{ default "Talos ready" .TITLE }}'
+      MESSAGE: '{{ default "Talos infrastructure has been created and is ready for use." .MESSAGE }}'
+    cmds:
+      - ntfy_alert.sh --topic {{.TOPIC}} --title "{{.TITLE}}" --message "{{.MESSAGE}}" -at "{{.AT}}"

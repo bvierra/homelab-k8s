@@ -1,0 +1,61 @@
+---
+# e3fab82b561b5e559cdf1c0b1e5950c0e52700b9208a2cfaa5b18454796f3a7e
+customization:
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/intel-ucode
+      - siderolabs/qemu-guest-agent
+---
+# 04a8a6957e274a99a12741e68396ac94d615be7b1163a8859c8488402a8fe1d1
+customization:
+  extraKernelArgs:
+    - console=ttyS0
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/intel-ucode
+      - siderolabs/iscsi-tools
+      - siderolabs/nfs-utils
+      - siderolabs/nfsd
+      - siderolabs/nfsrahead
+      - siderolabs/qemu-guest-agent
+---
+# 5459d0c07dd86c93f33db25883a9d1b7d2c3bf4220ed60123089ad194720d9e0
+customization:
+  extraKernelArgs:
+    - console=ttyS0
+    - net.ifnames=0
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/intel-ucode
+      - siderolabs/iscsi-tools
+      - siderolabs/nfs-utils
+      - siderolabs/nfsd
+      - siderolabs/nfsrahead
+      - siderolabs/qemu-guest-agent
+  bootloader: grub
+---
+# 605c790b41e46f9e43ebc6069b847e50af2ad1f2baae4d10a8be172b5dfef4f7
+customization:
+  extraKernelArgs:
+    - console=tty0
+    - console=ttyS0,115200
+    - net.ifnames=0
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/intel-ucode
+      - siderolabs/iscsi-tools
+      - siderolabs/nfs-utils
+      - siderolabs/nfsd
+      - siderolabs/nfsrahead
+      - siderolabs/qemu-guest-agent
+---
+# 49233ffe8d4e957415bb01511062079d00d8e6430ce9f3e2080a89f38a684c59
+customization:
+  extraKernelArgs:
+    - -console
+    - console=tty0
+    - console=ttyS0,115200
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/intel-ucode
+      - siderolabs/qemu-guest-agent
