@@ -6,7 +6,7 @@ metadata:
   name: cert-manager
   namespace: cert-manager
   labels:
-    manifests.vierra.host/file-location: manifests/apps/cert-manager/cert-manager/base/kustomization.yaml
+    manifests.vierra.host/file-location: "manifests/apps/cert-manager/cert-manager/base/kustomization.yaml"
 resources:
   - ./cloudflare/secret.sops.yaml
   - ./helmrelease.yaml

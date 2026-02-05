@@ -6,7 +6,7 @@ metadata:
   name: &name cert-manager
   namespace: cert-manager
   labels:
-    manifests.vierra.host/file-location: manifests/apps/cert-manager/cert-manager/kustomization.yaml
+    manifests.vierra.host/file-location: "manifests/apps/cert-manager/cert-manager/kustomization.yaml"
 spec:
   interval: 1h
   retryInterval: 2m
