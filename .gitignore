@@ -1,4 +1,6 @@
+.env
 artifacts/
+bootstrap/talos/clusterconfig/*
 bootstrap/tofu/*/terraform.tfstate
 bootstrap/tofu/*/terraform.tfstate.backup
 bootstrap/tofu/*/.terraform
