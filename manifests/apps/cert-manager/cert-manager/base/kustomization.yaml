@@ -13,6 +13,7 @@ resources:
   - ./referencegrant.yaml
 configMapGenerator:
   - name: cert-manager-values
+    namespace: cert-manager
     files:
       - values.yaml=./helm/values.yaml
 configurations:
