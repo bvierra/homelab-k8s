@@ -12,3 +12,4 @@ components:
   - ../../components/namespace
 resources:
   - ./cert-manager/kustomization.yaml
+  - ./cert-manager-configs/kustomization.yaml
