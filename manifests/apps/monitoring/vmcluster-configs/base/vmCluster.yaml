@@ -5,7 +5,7 @@ metadata:
   namespace: monitoring
 spec:
   # Add fields here
-  retentionPeriod: "3m"
+  retentionPeriod: "3M"
   vmstorage:
     replicaCount: 2
   vmselect:
