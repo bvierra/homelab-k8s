@@ -3,13 +3,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: victoria-metrics-operator-crds
+  name: victoria-metrics-operator
 spec:
   interval: 1h
   timeout: 5m
   chartRef:
     kind: OCIRepository
-    name: victoriametricsoperatorcrds
+    name: victoriametricsoperator
     namespace: flux-system
   install:
     remediation:
@@ -18,3 +18,7 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 5
+
+  valuesFrom:
+    - kind: ConfigMap
+      name: victoria-metrics-operator-values

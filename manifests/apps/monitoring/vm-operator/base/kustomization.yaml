@@ -4,3 +4,9 @@ kind: Kustomization
 namespace: monitoring
 resources:
   - ./helmrelease.yaml
+configMapGenerator:
+  - name: victoria-metrics-operator-values
+    files:
+      - values.yaml=./helm/values.yaml
+configurations:
+  - ./helm/kustomizeconfig.yaml

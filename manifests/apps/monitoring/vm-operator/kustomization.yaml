@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &name victoria-metrics-operator-crds
+  name: &name victoria-metrics-operator
   namespace: monitoring
 spec:
   interval: 1h
