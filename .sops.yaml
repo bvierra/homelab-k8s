@@ -1,0 +1,14 @@
+creation_rules:
+  - encrypted_regex: '^(data|stringData|caBundle)$'
+    path_regex: 'manifests/.*\.sops\.ya?ml$'
+    age: >-
+      age1488hlf6e7qc2wtgtv9f92n0zvryzytjw5l9scrg9gg8dfmxwafksdgggy3,
+      age1ek2lwx2vgqfcaqwkp02mpgttpr2nzmz0ylvgredlzqc3km3weqaqdmsznc,
+  - path_regex: 'talos/.*\.sops\.ya?ml$'
+    age: >-
+      age1488hlf6e7qc2wtgtv9f92n0zvryzytjw5l9scrg9gg8dfmxwafksdgggy3,
+      age1ek2lwx2vgqfcaqwkp02mpgttpr2nzmz0ylvgredlzqc3km3weqaqdmsznc,
+  - path_regex: '.*-secret\.sops\.ya?ml$'
+    age: >-
+      age1488hlf6e7qc2wtgtv9f92n0zvryzytjw5l9scrg9gg8dfmxwafksdgggy3,
+      age1ek2lwx2vgqfcaqwkp02mpgttpr2nzmz0ylvgredlzqc3km3weqaqdmsznc,
