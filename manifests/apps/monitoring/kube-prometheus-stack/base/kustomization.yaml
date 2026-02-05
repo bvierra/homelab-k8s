@@ -5,7 +5,7 @@ metadata:
   name: kube-prometheus-stack
   namespace: monitoring
 resources:
-  - ./prometheus-user-sercret.sops.yaml
+  - ./prometheus-user-secret.sops.yaml
   - ./helmrelease.yaml
 configMapGenerator:
   - name: kube-prometheus-stack-values
