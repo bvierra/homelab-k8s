@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# This script is for managing SOPS keys and configuration for encrypting secrets.
+# It can generate server and user keys, create the .sops.yaml configuration file,
+# export the server key to Kubernetes, and clean up existing keys.
+# You can have more than a single user key for different team members.
+
+
 
 shopt -s globstar
 
@@ -90,7 +96,9 @@ create_sops_config() {
   for file in "$ARTIFACTS_DIR"/sops/**/*.pubkey; do
     pub_keys+=("$(cat "$file"),")
   done
-  PUB_KEY=$(IFS=$'\n'; echo "${pub_keys[*]}" | sed 's/^/      /')
+  pub_keys_str=$(IFS=$'\n'; echo "${pub_keys[*]}")
+  PUB_KEY=${pub_keys_str//^/      /}
+  #PUB_KEY=$(IFS=$'\n'; echo "${pub_keys[*]}" | sed 's/^/      /')
   cat <<EOF > "$ROOT_DIR/.sops.yaml"
 creation_rules:
   - encrypted_regex: '^(data|stringData|caBundle)$'
