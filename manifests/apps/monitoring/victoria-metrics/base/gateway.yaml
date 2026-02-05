@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: monitoring-tls-gateway
+  namespace: monitoring
+  annotations:
+    cert-manager.io/issuer: letsencrypt-stage
+spec:
+  gatewayClassName: cilium
+  addresses:
+    - type: IPAddress
+      value: 10.11.100.10
+  listeners:
+    - name: https-mon
+      port: 443
+      protocol: HTTPS
+      hostname: "mon.k8s.${DOMAIN_0}"
+      tls:
+        certificateRefs:
+          - name: mon-tls-cert
+            kind: Secret
