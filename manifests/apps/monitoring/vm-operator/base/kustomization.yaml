@@ -1,12 +1,6 @@
----
 # yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/kustomization.json
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-metadata:
-  name: apps-monitoring-kustomization
 namespace: monitoring
-components:
-  - ../../components/namespace-privileged
 resources:
-  - ./prometheus-operator-crds/kustomization.yaml
-  - ./vm-operator/kustomization.yaml
+  - ./helmrelease.yaml
