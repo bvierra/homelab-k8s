@@ -8,12 +8,5 @@ namespace: monitoring
 components:
   - ../../components/namespace-privileged
 resources:
-  - ./kube-prometheus-stack/fluxtomization.yaml
-  #- ./prometheus-operator-crds/kustomization.yaml
-  #- ./vm-operator/kustomization.yaml
-  #- ./vmcluster-configs/fluxtomization.yaml
-  #- ./grafana/fluxtomization.yaml
-
-
-
-  - ./prometheus-operator-crds/fluxtomization.yaml
+  - ./kube-prometheus-stack/kustomization.yaml
+  - ./prometheus-operator-crds/kustomization.yaml
