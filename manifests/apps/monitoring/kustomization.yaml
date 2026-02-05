@@ -10,3 +10,5 @@ components:
 resources:
   - ./prometheus-operator-crds/kustomization.yaml
   - ./vm-operator/kustomization.yaml
+
+  - ./vmcluster-configs/fluxtomization.yaml
