@@ -4,7 +4,7 @@ metadata:
   name: monitoring-tls-gateway
   namespace: monitoring
   annotations:
-    cert-manager.io/issuer: letsencrypt-stage
+    cert-manager.io/cluster-issuer: letsencrypt-stage
 spec:
   gatewayClassName: cilium
   addresses:
