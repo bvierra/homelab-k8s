@@ -1,18 +1,124 @@
 ---
 version: "3"
 
+set: [pipefail]
+shopt: [globstar]
+
+includes:
+  proxmox:
+    taskfile: ./bootstrap/tofu/talos/Taskfile.yaml
+    dir: ./bootstrap/tofu/talos
+  talos:
+    taskfile: ./bootstrap/talos/Taskfile.yaml
+    dir: ./bootstrap/talos
+  flux:
+    taskfile: .tasks/flux/Taskfile.yaml
+
 env:
   KUBECONFIG: "{{ .HOME }}/.kube/config"
 
-set: [pipefail]
-shopt: [globstar]
+vars:
+  MANIFESTS_DIR: "{{ .ROOT_TASKFILE }}/manifests"
+  SOPS_SERVER_AGE_KEY_FILE: "{{ .ROOT_TASKFILE }}/artifacts/sops/server/server.privkey"
+  SOPS_AGE_KEY_FILE: "{{ .ROOT_TASKFILE }}/artifacts/sops/user/user.privkey"
 
 tasks:
   default: task --list
 
-  reconcile:
-    desc: Force Flux to pull in changes from your Git repository
-    cmd: flux --namespace flux-system reconcile kustomization flux-system --with-source
+  talos-recreate:
+    desc: Destroy and recreate Talos infrastructure
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - task: talos:fullresetandbootstrap
+        vars:
+          SUPPRESS_ALERT: true
+      - sleep 5
+      - task: install-flux
+        vars:
+          SUPPRESS_ALERT: true
+      - defer: |
+          {{ if .SUPPRESS_ALERT | contains "false" }}
+            {{ if .EXIT_CODE }}
+              ntfy_alert.sh --topic "k8s" --title "talos-recreate failed" --message "Task talos-recreate failed" -at "fail"
+            {{else}}
+              ntfy_alert.sh --topic "k8s" --title "talos-recreate completed" --message "Talos infrastructure has been re-created successfully" -at "pass"
+            {{end}}
+          {{ end }}
+
+  cluster-recreate:
+    desc: Destroy existing cluster and install a new one
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - task: proxmox:destroy
+        vars:
+          SUPPRESS_ALERT: true
+      - task: install-cluster
+        vars:
+          SUPPRESS_ALERT: true
+      - defer: |
+          {{ if .SUPPRESS_ALERT | contains "false" }}
+            {{ if .EXIT_CODE }}
+              ntfy_alert.sh --topic "k8s" --title "destroyandinstall-cluster failed" --message "Task destroyandinstall-cluster failed" -at "fail"
+            {{else}}
+              ntfy_alert.sh --topic "k8s" --title "destroyandinstall-cluster completed" --message "Kubernetes cluster has been re-installed successfully" -at "pass"
+            {{end}}
+          {{ end }}
+
+  cluster-install:
+    desc: Run tofu to setup VM's, configure Talos, install k8s, install flux
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - task: proxmox:apply
+        vars:
+          SUPPRESS_ALERT: true
+      - task: talos:setupCluster
+        vars:
+          SUPPRESS_ALERT: true
+      - task: install-flux
+        vars:
+          SUPPRESS_ALERT: true
+      - defer: |
+          {{ if .SUPPRESS_ALERT | contains "false" }}
+            {{ if .EXIT_CODE }}
+              ntfy_alert.sh --topic "k8s" --title "install-cluster failed" --message "Task install-cluster failed" -at "fail"
+            {{else}}
+              ntfy_alert.sh --topic "k8s" --title "install-cluster completed" --message "Kubernetes cluster has been installed successfully" -at "pass"
+            {{end}}
+          {{ end }}
+
+  flux-install:
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    desc: Install Flux into your cluster
+    cmds:
+      - kubectl apply --kustomize {{.MANIFESTS_DIR}}/bootstrap
+      - cat {{.SOPS_SERVER_AGE_KEY_FILE}} | kubectl -n flux-system create secret generic sops-age --from-file=keys.agekey=/dev/stdin
+      - sops --decrypt {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-secrets.secret.sops.yaml | kubectl apply --filename -
+      - kubectl apply -f {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-settings.yaml
+      - kubectl apply --kustomize {{.MANIFESTS_DIR}}/clusters/k8s/flux-system
+      - sleep 5
+      - kubectl -n flux-system annotate secret sops-age "reflector.v1.k8s.emberstack.com/reflection-allowed=true" 'reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces'=""
+      - kubectl -n flux-system annotate secret cluster-secrets "reflector.v1.k8s.emberstack.com/reflection-allowed=true" 'reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces'=""
+      - kubectl -n flux-system annotate configmap cluster-settings "reflector.v1.k8s.emberstack.com/reflection-allowed=true" 'reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces'=""
+      - defer: |
+          {{ if .SUPPRESS_ALERT | contains "false" }}
+            {{ if .EXIT_CODE }}
+              ntfy_alert.sh --topic "k8s" --title "install-flux failed" --message "Task install-flux failed" -at "fail"
+            {{else}}
+              ntfy_alert.sh --topic "k8s" --title "install-flux completed" --message "Task install-flux completed successfully" -at "pass"
+            {{end}}
+          {{end}}
     preconditions:
-      - test -f {{.KUBECONFIG}}
-      - which flux
+      # TODO: Bettere error messages, include commands to fix
+      - sh: test -f {{.SOPS_SERVER_AGE_KEY_FILE}}
+        msg: |
+          Server Age key file is not found. Did you forget to create it?
+      - sh: test -f {{.SOPS_AGE_KEY_FILE}}
+        msg: |
+          User Age key file is not found. Did you forget to create it?
+      # TODO: Figure out how best to have these generated
+      - test -f {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-secrets.secret.sops.yaml
+      - test -f {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-settings.yaml

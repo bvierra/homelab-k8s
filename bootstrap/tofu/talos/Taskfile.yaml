@@ -13,8 +13,18 @@ tasks:
 
   apply:
     desc: Create Talos infrastructure
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
     cmds:
       - tofu apply -auto-approve -parallelism={{.PARALLEL_APPLY}}
+      - |
+        {{ if .SUPPRESS_ALERT | contains "false" }}
+          {{ if .EXIT_CODE }}
+            ntfy_alert.sh --topic "k8s" --title "proxmox:recreate failed" --message "Task proxmox:recreate failed" -at "fail"
+          {{else}}
+            ntfy_alert.sh --topic "k8s" --title "proxmox:recreate completed" --message "Task proxmox:recreate completed successfully" -at "pass"
+          {{end}}
+        {{end}}
     preconditions:
       - which tofu
       - sh: "test -f backend.tf"
@@ -22,32 +32,39 @@ tasks:
 
   destroy:
     desc: Destroy Talos infrastructure
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
     cmds:
       - tofu destroy -auto-approve -parallelism={{.PARALLEL_DESTROY}}
+      - |
+        {{ if .SUPPRESS_ALERT | contains "false" }}
+          {{ if .EXIT_CODE }}
+            ntfy_alert.sh --topic "k8s" --title "proxmox:recreate failed" --message "Task proxmox:recreate failed" -at "fail"
+          {{else}}
+            ntfy_alert.sh --topic "k8s" --title "proxmox:recreate completed" --message "Task proxmox:recreate completed successfully" -at "pass"
+          {{end}}
+        {{end}}
     preconditions:
       - sh: "test -f backend.tf"
         msg: "Backend does not exist. Nothing to destroy."
 
   recreate:
     desc: Destroy and recreate Talos infrastructure
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
     cmds:
       - task: destroy
+        vars:
+          SUPPRESS_ALERT: true
       - sleep 5
       - task: apply
-      - task: notify
         vars:
-          {
-            AT: "pass",
-            TITLE: "Talos infrastructure recreated",
-            MESSAGE: "Talos infrastructure has been destroyed and recreated successfully.",
-          }
-
-  notify:
-    desc: Send a notification that Talos infrastructure has been created
-    vars:
-      AT: '{{ default "none" .AT }}'
-      TOPIC: '{{ default "k8s" .TOPIC }}'
-      TITLE: '{{ default "Talos ready" .TITLE }}'
-      MESSAGE: '{{ default "Talos infrastructure has been created and is ready for use." .MESSAGE }}'
-    cmds:
-      - ntfy_alert.sh --topic {{.TOPIC}} --title "{{.TITLE}}" --message "{{.MESSAGE}}" -at "{{.AT}}"
+          SUPPRESS_ALERT: true
+      - |
+        {{ if .SUPPRESS_ALERT | contains "false" }}
+          {{ if .EXIT_CODE }}
+            ntfy_alert.sh --topic "k8s" --title "proxmox:recreate failed" --message "Task proxmox:recreate failed" -at "fail"
+          {{else}}
+            ntfy_alert.sh --topic "k8s" --title "proxmox:recreate completed" --message "Task proxmox:recreate completed successfully" -at "pass"
+          {{end}}
+        {{end}}
