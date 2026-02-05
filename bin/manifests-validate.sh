@@ -38,9 +38,13 @@ kustomize_config="kustomization.yaml"
 kubeconform_flags=("-skip=Secret")
 kubeconform_config=("-strict" "-ignore-missing-schemas" "-schema-location" "default" "-schema-location" "/tmp/flux-crd-schemas" "-verbose")
 
-echo "INFO - Downloading Flux OpenAPI schemas"
-mkdir -p /tmp/flux-crd-schemas/master-standalone-strict
-curl -sL https://github.com/fluxcd/flux2/releases/latest/download/crd-schemas.tar.gz | tar zxf - -C /tmp/flux-crd-schemas/master-standalone-strict
+if [[ ! -d /tmp/flux-crd-schemas/master-standalone-strict ]]; then
+  echo "INFO - Downloading Flux OpenAPI schemas"
+  mkdir -p /tmp/flux-crd-schemas/master-standalone-strict
+  curl -sL https://github.com/fluxcd/flux2/releases/latest/download/crd-schemas.tar.gz | tar zxf - -C /tmp/flux-crd-schemas/master-standalone-strict
+else
+  echo "INFO - Skipping download of Flux OpenAPI schemas - it already exists"
+fi
 
 find "${ROOT_DIR}/manifests" -type f -name '*.yaml' -print0 | while IFS= read -r -d $'\0' file;
   do
@@ -49,7 +53,7 @@ find "${ROOT_DIR}/manifests" -type f -name '*.yaml' -print0 | while IFS= read -r
 done
 
 echo "INFO - Validating clusters"
-find "${ROOT_DIR}/manifests/clusters" -maxdepth 2 -type f -name '*.yaml' -print0 | while IFS= read -r -d $'\0' file;
+find "${ROOT_DIR}/manifests/clusters" -maxdepth 3 -type f -name '*.yaml' -print0 | while IFS= read -r -d $'\0' file;
   do
     kubeconform "${kubeconform_flags[@]}" "${kubeconform_config[@]}" "${file}"
     if [[ ${PIPESTATUS[0]} != 0 ]]; then
