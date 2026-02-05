@@ -7,5 +7,6 @@ resources:
   - ./emberstack.yaml
   - ./grafana.yaml
   - ./jetstack.yaml
+  - ./kube-prometheus-stack.yaml
   - ./prometheus-community.yaml
   - ./victoriametricsoperator.yaml
