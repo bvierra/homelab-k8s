@@ -9,6 +9,7 @@ resources:
   - ./helmrelease.yaml
 configMapGenerator:
   - name: kube-prometheus-stack-values
+    namespace: monitoring
     files:
       - values.yaml=./helm/values.yaml
 configurations:
