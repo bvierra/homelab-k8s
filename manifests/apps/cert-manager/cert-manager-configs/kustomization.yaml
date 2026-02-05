@@ -24,3 +24,6 @@ spec:
         name: cluster-settings
       - kind: Secret
         name: cluster-secrets
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager

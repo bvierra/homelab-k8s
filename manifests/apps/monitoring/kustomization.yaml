@@ -15,3 +15,5 @@ resources:
   #- ./grafana/fluxtomization.yaml
 
 
+
+  - ./prometheus-operator-crds/fluxtomization.yaml
