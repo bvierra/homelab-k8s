@@ -54,7 +54,7 @@ tasks:
       - task: proxmox:destroy
         vars:
           SUPPRESS_ALERT: true
-      - task: install-cluster
+      - task: cluster-install
         vars:
           SUPPRESS_ALERT: true
       - defer: |
@@ -77,7 +77,7 @@ tasks:
       - task: talos:setupCluster
         vars:
           SUPPRESS_ALERT: true
-      - task: install-flux
+      - task: flux-install
         vars:
           SUPPRESS_ALERT: true
       - defer: |
