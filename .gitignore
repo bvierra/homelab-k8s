@@ -1,6 +1,7 @@
 .env
 artifacts/
 bootstrap/talos/clusterconfig/*
+bootstrap/talos/patches/cilium-values.yaml
 bootstrap/tofu/*/terraform.tfstate
 bootstrap/tofu/*/terraform.tfstate.backup
 bootstrap/tofu/*/.terraform

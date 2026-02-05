@@ -1,0 +1,159 @@
+---
+version: "3"
+
+set: [pipefail]
+tasks:
+  default: task --list
+
+  apply:
+    desc: Apply Talos config to the cluster
+    cmds:
+      - test -f ~/.talos/config && rm -f ~/.talos/config || true
+      - talhelper gencommand apply --extra-flags="--insecure" | bash
+      - cp -f clusterconfig/talosconfig ~/.talos/config
+    preconditions:
+      - sh: test -f clusterconfig/talosconfig
+        msg: "clusterconfig/talosconfig does not exist. You need to run task 'genconfig' first."
+
+  bootstrap:
+    desc: Bootstrap Talos control plane nodes
+    cmds:
+      - talhelper gencommand bootstrap | bash
+    preconditions:
+      - sh: test -f clusterconfig/talosconfig
+        msg: "clusterconfig/talosconfig does not exist. You need to run task 'genconfig' first."
+
+  bootstrapwait:
+    desc: Wait for Talos bootstrap to complete
+    cmds:
+      - ./bin/wait-bootstrap.sh
+
+  encrypt:
+    desc: Encrypt talsecret.sops.yaml
+    cmds:
+      - sops --encrypt --in-place talsecret.sops.yaml
+    preconditions:
+      - sh: test -f talsecret.sops.yaml
+        msg: "talsecret.sops.yaml does not exist. Generate it first."
+
+  fullreset:
+    desc: Full reset of Talos cluster (remove config + destroy + setup)
+    cmds:
+      - ./bin/resetnodes.sh
+
+  fullresetandbootstrap:
+    desc: Full reset and bootstrap of Talos cluster (remove config + destroy + setup + bootstrap + wait + health)
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - task: fullreset
+      - sleep 5
+      - task: setupCluster
+      - defer: |
+          {{ if .SUPPRESS_ALERT | contains "false" }}
+            {{ if .EXIT_CODE }}
+              ntfy_alert.sh --topic "k8s" --title "talos:fullresetandbootstrap failed" --message "Task fullresetandbootstrap failed" -at "fail"
+            {{else}}
+              ntfy_alert.sh --topic "k8s" --title "talos:fullresetandbootstrap completed" --message "Talos talos cluster has been reset and bootstrapped successfully." -at "pass"
+            {{end}}
+          {{ end }}
+
+  genconfig:
+    desc: Generate Talos config files
+    cmds:
+      - ./bin/cilium-create-values.sh
+      - talhelper genconfig
+    preconditions:
+      - sh: test -f talsecret.sops.yaml
+        msg: "talsecret.sops.yaml does not exist. Generate and encrypt it first."
+      - sh: test .sops.yaml
+        msg: ".sops.yaml does not exist. Please create it to specify SOPS configuration."
+
+  gensecret:
+    desc: Generate talsecret.sops.yaml
+    cmds:
+      - talhelper gensecret > talsecret.sops.yaml
+    preconditions:
+      - sh: test ! -f talsecret.sops.yaml
+        msg: "talsecret.sops.yaml already exists. Remove it first if you want to regenerate."
+
+  health:
+    desc: Check Talos cluster health
+    cmds:
+      - cmd: ./bin/wait-health.sh
+    preconditions:
+      - sh: test -f clusterconfig/talosconfig
+        msg: "clusterconfig/talosconfig does not exist. You need to run task 'genconfig' first."
+
+  kubeconfig:
+    desc: Generate kubeconfig file for the Talos cluster
+    cmds:
+      - test -f ~/.kube/config && rm -f ~/.kube/config || true
+      - talhelper gencommand kubeconfig | bash
+    preconditions:
+      - sh: test -f clusterconfig/talosconfig
+        msg: "clusterconfig/talosconfig does not exist. You need to run task 'genconfig' first."
+
+  notify:
+    desc: Send a notification that Talos infrastructure has been created
+    vars:
+      TOPIC: '{{ default "k8s" .TOPIC }}'
+      TITLE: '{{ default "Talos ready" .TITLE }}'
+      AT: '{{ default "none" .AT }}'
+      MESSAGE: '{{ default "Talos infrastructure has been created and is ready for use." .MESSAGE }}'
+    cmds:
+      - ntfy_alert.sh --topic {{.TOPIC}} --title "{{.TITLE}}" --message "{{.MESSAGE}}" -at "{{.AT}}"
+
+  rmclusterconfig:
+    desc: Remove Talos clusterconfig file
+    cmds:
+      - rm -rf clusterconfig/
+      - rm -f ~/.kube/config
+      - rm -f ~/.talos/config
+    preconditions:
+      - sh: test -d clusterconfig
+        msg: "clusterconfig does not exist. Nothing to remove."
+
+  setupCilium:
+    desc: Install Cilium on the Talos cluster
+    cmds:
+      - ./bin/cilium-install-configs.sh
+
+  setupCluster:
+    desc: Setup the cluster - genconfig, apply, bootstrap, bootstrapwait
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - task: genconfig
+      - task: apply
+      - sleep 5
+      - task: bootstrap
+      - task: bootstrapwait
+      - defer: |
+          {{ if .SUPPRESS_ALERT | contains "false" }}
+            {{ if .EXIT_CODE }}
+              ntfy_alert.sh --topic "k8s" --title "talos:setupCluster failed" --message "Task setupCluster failed" -at "fail"
+            {{else}}
+              ntfy_alert.sh --topic "k8s" --title "talos:setupCluster completed" --message "Talos kubernetes cluster has been bootstrapped successfully." -at "pass"
+            {{end}}
+          {{ end }}
+
+  setupSecrets:
+    desc: Setup SOPS age key secret on the cluster
+    cmds:
+      - kubectl create ns flux-system
+      - cat {{.SOPS_AGE_KEY_FILE}} | kubectl -n flux-system create secret generic sops-age --from-file=age.key=/dev/stdin
+      - SOPS_AGE_KEY_FILE="{{.SOPS_AGE_KEY_FILE}}" sops --decrypt {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-secrets.secret.sops.yaml | kubectl apply --filename -
+      - kubectl apply -f {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-settings.yaml
+    preconditions:
+      - sh: test -f {{.SOPS_AGE_KEY_FILE}}
+        msg: |
+          Age key file is not found. Did you forget to create it?
+
+  update-talos-config:
+    desc: Update Talos config on the cluster nodes
+    cmds:
+      - talhelper gencommand apply | bash
+    preconditions:
+      - sh: test -f clusterconfig/talosconfig
+        msg: "clusterconfig/talosconfig does not exist. You need to run task 'genconfig' first."

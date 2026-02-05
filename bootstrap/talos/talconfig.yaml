@@ -1,0 +1,301 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bvierra/talhelper/refs/heads/master/pkg/config/schemas/talconfig.json
+---
+clusterName: k8s
+talosVersion: v1.12.1
+kubernetesVersion: v1.35.0
+endpoint: https://10.10.130.101:6443
+allowSchedulingOnMasters: false
+additionalMachineCertSans:
+  - 10.10.130.101
+additionalApiServerCertSans:
+  - kube.k8s.vierra.host
+  - api.k8s.vierra.host
+  - k8s.vierra.host
+clusterPodNets:
+  - 10.244.0.0/16
+clusterSvcNets:
+  - 10.96.0.0/12
+cniConfig:
+  name: none
+nodes:
+  - hostname: cp01
+    installDisk: /dev/sda
+    ipAddress: 10.10.130.101
+    controlPlane: true
+    machineSpec:
+      mode: metal
+      arch: amd64
+      useUKI: false
+      secureboot: false
+    nodeLabels:
+      rack: s1
+    nodeAnnotations:
+      rack: s1
+    nameservers:
+      - 10.10.130.1
+    networkInterfaces:
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:01:01"
+        dhcp: false
+        addresses:
+          - 10.10.130.101/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.10.130.1
+        vip:
+          ip: 10.10.130.100
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:0a:01"
+        dhcp: false
+        addresses:
+          - 10.10.140.101/24
+        mtu: 9000
+  - hostname: cp02
+    installDisk: /dev/sda
+    ipAddress: 10.10.130.102
+    controlPlane: true
+    machineSpec:
+      mode: metal
+      arch: amd64
+      useUKI: false
+      secureboot: false
+    nodeLabels:
+      rack: s2
+    nodeAnnotations:
+      rack: s2
+    disableSearchDomain: true
+    nameservers:
+      - 10.10.130.1
+    networkInterfaces:
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:01:02"
+        dhcp: false
+        addresses:
+          - 10.10.130.102/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.10.130.1
+        vip:
+          ip: 10.10.130.100
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:0a:02"
+        dhcp: false
+        addresses:
+          - 10.10.140.102/24
+        mtu: 9000
+  - hostname: cp03
+    installDisk: /dev/sda
+    ipAddress: 10.10.130.103
+    controlPlane: true
+    machineSpec:
+      mode: metal
+      arch: amd64
+      useUKI: false
+      secureboot: false
+    nodeLabels:
+      rack: s3
+    nodeAnnotations:
+      rack: s3
+    disableSearchDomain: true
+    nameservers:
+      - 10.10.130.1
+    networkInterfaces:
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:01:03"
+        dhcp: false
+        addresses:
+          - 10.10.130.103/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.10.130.1
+        vip:
+          ip: 10.10.130.100
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:0a:03"
+        dhcp: false
+        addresses:
+          - 10.10.140.103/24
+        mtu: 9000
+  - hostname: worker01
+    installDisk: /dev/sda
+    ipAddress: 10.10.130.111
+    controlPlane: false
+    machineSpec:
+      mode: metal
+      arch: amd64
+      useUKI: false
+      secureboot: false
+    nodeLabels:
+      rack: s1
+    nodeAnnotations:
+      rack: s1
+    disableSearchDomain: true
+    nameservers:
+      - 10.10.130.1
+    networkInterfaces:
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:02:01"
+        dhcp: false
+        addresses:
+          - 10.10.130.111/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.10.130.1
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:0b:01"
+        dhcp: false
+        addresses:
+          - 10.10.140.111/24
+        mtu: 9000
+  - hostname: worker02
+    installDisk: /dev/sda
+    ipAddress: 10.10.130.112
+    controlPlane: false
+    machineSpec:
+      mode: metal
+      arch: amd64
+      useUKI: false
+      secureboot: false
+    nodeLabels:
+      rack: s2
+    nodeAnnotations:
+      rack: s2
+    disableSearchDomain: true
+    nameservers:
+      - 10.10.130.1
+    networkInterfaces:
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:02:02"
+        dhcp: false
+        addresses:
+          - 10.10.130.112/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.10.130.1
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:0b:02"
+        dhcp: false
+        addresses:
+          - 10.10.140.112/24
+        mtu: 9000
+  - hostname: worker03
+    installDisk: /dev/sda
+    ipAddress: 10.10.130.113
+    controlPlane: false
+    machineSpec:
+      mode: metal
+      arch: amd64
+      useUKI: false
+      secureboot: false
+    nodeLabels:
+      rack: s3
+    nodeAnnotations:
+      rack: s3
+    disableSearchDomain: true
+    nameservers:
+      - 10.10.130.1
+    networkInterfaces:
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:02:03"
+        dhcp: false
+        addresses:
+          - 10.10.130.113/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.10.130.1
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:0b:03"
+        dhcp: false
+        addresses:
+          - 10.10.140.113/24
+        mtu: 9000
+  - hostname: worker04
+    installDisk: /dev/sda
+    ipAddress: 10.10.130.114
+    controlPlane: false
+    machineSpec:
+      mode: metal
+      arch: amd64
+      useUKI: false
+      secureboot: false
+    nodeLabels:
+      rack: s4
+    nodeAnnotations:
+      rack: s4
+    disableSearchDomain: true
+    nameservers:
+      - 10.10.130.1
+    networkInterfaces:
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:02:04"
+        dhcp: false
+        addresses:
+          - 10.10.130.114/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.10.130.1
+      - deviceSelector:
+          driver: virtio_net
+          hardwareAddr: "bc:24:11:bc:0b:04"
+        dhcp: false
+        addresses:
+          - 10.10.140.114/24
+        mtu: 9000
+
+patches:
+  - "@./patches/global/machine-features.yaml"
+
+controlPlane:
+  schematic:
+    customization:
+      extraKernelArgs:
+        - console=tty0
+        - console=ttyS0,115200
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/intel-ucode
+          - siderolabs/iscsi-tools
+          - siderolabs/nfs-utils
+          - siderolabs/nfsd
+          - siderolabs/nfsrahead
+          - siderolabs/qemu-guest-agent
+  patches:
+    - "@./patches/cp/machine-features.yaml"
+    - "@./patches/cp/cluster-apiserver.yaml"
+    - "@./patches/cp/cluster-controllermanager.yaml"
+    - "@./patches/cp/cluster-coredns.yaml"
+    - "@./patches/cp/cluster-etcd.yaml"
+    - "@./patches/cp/cluster-extramanifests.yaml"
+    - "@./patches/cp/cluster-network.yaml"
+    - "@./patches/cp/cluster-proxy.yaml"
+    - "@./patches/cp/machine-features.yaml"
+    - "@./patches/cilium-install.yaml"
+    - "@./patches/cilium-values.yaml"
+
+worker:
+  schematic:
+    customization:
+      extraKernelArgs:
+        - console=tty0
+        - console=ttyS0,115200
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/intel-ucode
+          - siderolabs/iscsi-tools
+          - siderolabs/nfs-utils
+          - siderolabs/nfsd
+          - siderolabs/nfsrahead
+          - siderolabs/qemu-guest-agent
