@@ -7,8 +7,8 @@ metadata:
 namespace: monitoring
 components:
   - ../../components/namespace-privileged
-resources:
-  - ./prometheus-operator-crds/kustomization.yaml
-  - ./vm-operator/kustomization.yaml
-  - ./vmcluster-configs/fluxtomization.yaml
-  - ./grafana/fluxtomization.yaml
+resources: []
+  #- ./prometheus-operator-crds/kustomization.yaml
+  #- ./vm-operator/kustomization.yaml
+  #- ./vmcluster-configs/fluxtomization.yaml
+  #- ./grafana/fluxtomization.yaml
