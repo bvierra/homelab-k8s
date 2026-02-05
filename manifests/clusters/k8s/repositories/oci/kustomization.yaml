@@ -7,5 +7,4 @@ resources:
   - ./emberstack.yaml
   - ./jetstack.yaml
   - ./prometheus-community.yaml
-  - ./victoriametrics.yaml
-  - ./victoriametricsoperatorcrds.yaml
+  - ./victoriametricsoperator.yaml
