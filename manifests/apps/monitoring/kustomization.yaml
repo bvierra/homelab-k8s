@@ -12,3 +12,7 @@ resources:
   - ./vm-operator/kustomization.yaml
 
   - ./vmcluster-configs/fluxtomization.yaml
+
+  - ./grafana-configs/fluxtomization.yaml
+
+  - ./grafana/fluxtomization.yaml

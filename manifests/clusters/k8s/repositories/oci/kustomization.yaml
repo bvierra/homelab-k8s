@@ -5,6 +5,7 @@ resources:
   - ./cilium.yaml
   - ./democratic-csi.yaml
   - ./emberstack.yaml
+  - ./grafana.yaml
   - ./jetstack.yaml
   - ./prometheus-community.yaml
   - ./victoriametricsoperator.yaml
