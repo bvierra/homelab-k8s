@@ -13,7 +13,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/monitoring/victoria-metrics-operator-crds/base/
+  path: ./manifests/apps/monitoring/vm-operator/base/
   sourceRef:
     kind: GitRepository
     name: homelab
