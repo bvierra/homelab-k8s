@@ -1390,7 +1390,7 @@ grafana:
     runAsNonRoot: true
     fsGroup: 65534
   initChownData:
-    enabled: false
+    enabled: falserr
   # initChownData:
   #   enabled: true
   #   securityContext:

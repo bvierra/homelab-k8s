@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://schemas.budimanjojo.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kustomize-mutating-webhook
+spec:
+  interval: 1h
+  timeout: 5m
+  chartRef:
+    kind: OCIRepository
+    name: kustomize-mutating-webhook
+    namespace: flux-system
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 5
+  valuesFrom:
+    - kind: ConfigMap
+      name: kustomize-mutating-webhook-values

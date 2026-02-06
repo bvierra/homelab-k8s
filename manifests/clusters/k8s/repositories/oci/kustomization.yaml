@@ -8,5 +8,6 @@ resources:
   - ./grafana.yaml
   - ./jetstack.yaml
   - ./kube-prometheus-stack.yaml
+  - ./kustomize-mutating-webhook.yaml
   - ./prometheus-community.yaml
   - ./victoriametricsoperator.yaml
