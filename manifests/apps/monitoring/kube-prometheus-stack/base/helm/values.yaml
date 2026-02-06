@@ -1236,9 +1236,6 @@ grafana:
   ##
   defaultDashboardsEnabled: true
 
-  initChownData:
-    enabled: false
-
   ## Deploy GrafanaDashboard CRDs that reference dashboards from ConfigMaps when grafana-operator is used
   ## These settings control how dashboards are integrated with the Grafana Operator
   ## Note: End user still need to create is own kind: GrafanaDataSource for Prometheus
@@ -1386,6 +1383,27 @@ grafana:
     size: 100Gi
     finalizers:
       - kubernetes.io/pvc-protection
+
+  securityContext:
+    runAsUser: 65534
+    runAsGroup: 65534
+    runAsNonRoot: true
+    fsGroup: 65534
+
+  # initChownData:
+  #   enabled: true
+  #   securityContext:
+  #     runAsUser: 65534
+  #     runAsGroup: 65534
+
+  initChownData:
+    securityContext:
+      capabilities:
+        add:
+          - CHOWN
+          - DAC_OVERRIDE
+        drop:
+          - ALL
 
   serviceAccount:
     create: true
