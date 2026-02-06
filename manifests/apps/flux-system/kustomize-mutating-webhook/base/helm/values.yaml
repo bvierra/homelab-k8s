@@ -92,7 +92,7 @@ webhook:
 
 certManager:
   # -- Enable cert-manager integration for TLS certificate management
-  enabled: true
+  enabled: false
   # -- Certificate duration (90 days default)
   certificateDuration: "2160h" # 90d
   # -- Certificate renewal threshold (15 days before expiry)
