@@ -6,5 +6,5 @@ metadata:
   name: flux-system
 namespace: flux-system
 resources:
-  #  - ./kubernetes-reflector/fluxtomization.yaml
+  - ./kubernetes-reflector/fluxtomization.yaml
   - ./kustomize-mutating-webhook/kustomization.yaml
