@@ -23,6 +23,6 @@ spec:
       kind: HelmRelease
       name: *name
       namespace: democratic-csi
-  dependsOn:
-    - name: flux-mutating-webhook
-      namespace: flux-system
+  # dependsOn:
+  #   - name: flux-mutating-webhook
+  #     namespace: flux-system
