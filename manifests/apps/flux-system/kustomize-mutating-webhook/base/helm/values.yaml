@@ -134,4 +134,4 @@ podDisruptionBudget:
 
 networkpolicy:
   # -- Create a NetworkPolicy to restrict traffic to the webhook
-  create: true
+  create: false
