@@ -49,7 +49,7 @@ service:
   # -- Service port for webhook server
   port: 8443
   # -- Create a headless service (no cluster IP)
-  headless: true
+  headless: false
 
 resources:
   requests:
