@@ -7,7 +7,7 @@
 
 SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")
 ROOT_DIR=$(readlink -f "$SCRIPT_DIR"/..)
-DEF_CILIUM_VALUES_FILE="${ROOT_DIR}/../../manifests/apps/kube-system/cilium-operator/base/helm/values.yaml"
+DEF_CILIUM_VALUES_FILE="${ROOT_DIR}/../../manifests/apps/kube-system/cilium/app/helm/values.yaml"
 
 CILIUM_VALUES_FILE=${CILIUM_VALUES_FILE:-${DEF_CILIUM_VALUES_FILE}}
 CILIUM_CM_OUT=${CILIUM_CM_OUT:-${ROOT_DIR}/patches/cilium-values.yaml}
