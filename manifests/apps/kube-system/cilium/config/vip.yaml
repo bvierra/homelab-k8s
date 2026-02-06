@@ -1,0 +1,18 @@
+# https://github.com/onedr0p/k8s-gitops-2/blob/main/kubernetes/apps/kube-system/cilium/config/vip.yaml
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: kube-vip
+#   annotations:
+#     lbipam.cilium.io/ips: 192.168.20.2
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     k8s-app: kube-apiserver
+#     tier: control-plane
+#   ports:
+#     - name: https
+#       port: 6443
+#       protocol: TCP
+#       targetPort: 6443

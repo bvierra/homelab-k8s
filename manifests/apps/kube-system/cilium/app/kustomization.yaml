@@ -5,11 +5,6 @@ kind: Kustomization
 namespace: kube-system
 resources:
   - ./helmrelease.yaml
-  - ./ciliumLoadBalancerIPPool.yaml
-  - ./ciliumBGPAdvertisement.yaml
-  - ./ciliumBGPClusterConfig.yaml
-  - ./ciliumBGPPeerConfig.yaml
-
 configMapGenerator:
   - name: cilium-values
     files:

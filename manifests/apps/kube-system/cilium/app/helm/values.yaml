@@ -1,5 +1,8 @@
 bpf:
+  datapathMode: netkit
   masquerade: true
+  preallocateMaps: true
+bpfClockProbe: true
 bgpControlPlane:
   enabled: true
 cgroup:
@@ -8,26 +11,26 @@ cgroup:
   hostRoot: /sys/fs/cgroup
 cni:
   exclusive: false
+dashboards:
+  enabled: true
 devices: "eth0 ens18"
+endpointRoutes:
+  enabled: true
 envoy:
-  securityContext:
-    capabilities:
-      keepCapNetBindService: true
-      envoy: [NET_ADMIN, PERFMON, BPF]
+  enabled: false
+hubble:
+  enabled: false
 externalIPs:
   enabled: true
 gatewayAPI:
   enabled: true
   enableAlpn: true
   enableAppProtocol: true
-hubble:
-  enabled: false
-  relay:
-    enabled: false
-    rollOutPods: true
-  ui:
-    enabled: false
-    rollOutPods: true
+ipam:
+  mode: kubernetes
+k8sServiceHost: 127.0.0.1
+k8sServicePort: 7445
+
 ingressController:
   enabled: true
   default: true
@@ -35,30 +38,33 @@ ingressController:
   service:
     annotations:
       io.cilium/lb-ipam-ips: 10.11.100.1
-ipam:
-  mode: kubernetes
-k8sServiceHost: localhost
-k8sServicePort: 7445
 kubeProxyReplacement: true
+kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+l2announcements:
+  enabled: false
 loadBalancer:
   algorithm: maglev
+  mode: dsr
+localRedirectPolicies:
+  enabled: true
 operator:
+  dashboards:
+    enabled: true
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  replicas: 2
   rollOutPods: true
-  resources:
-    limits:
-      cpu: 500m
-      memory: 256Mi
-    requests:
-      cpu: 50m
-      memory: 128Mi
+pmtuDiscovery:
+  enabled: true
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    trustCRDsExist: true
 rollOutCiliumPods: true
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 200m
-    memory: 512Mi
+routingMode: native
 securityContext:
   capabilities:
     ciliumAgent:
@@ -80,3 +86,6 @@ securityContext:
       - SYS_RESOURCE
 debug:
   enabled: false
+socketLB:
+  enabled: true
+  hostNamespaceOnly: true

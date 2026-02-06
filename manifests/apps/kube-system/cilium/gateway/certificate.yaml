@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-k8s
+spec:
+  secretName: wildcard-k8s-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-stage
+  commonName: "k8s.${DOMAIN_0}"
+  dnsNames:
+    - "k8s.${DOMAIN_0}"
+    - "*.k8s.${DOMAIN_0}"
+  # secretTemplate:
+  #   annotations:
+  #     reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+  #     reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+  #     reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "kube-system"

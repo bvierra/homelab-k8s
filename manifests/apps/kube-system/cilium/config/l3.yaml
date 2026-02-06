@@ -1,0 +1,56 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPAdvertisement
+metadata:
+  name: l3-bgp-advertisement
+  labels:
+    advertise: bgp
+spec:
+  advertisements:
+    - advertisementType: "Service"
+      service:
+        addresses: # <--- specify the service types to advertise
+          - LoadBalancerIP
+      selector: # <--- select all services
+        matchExpressions:
+          - { key: somekey, operator: NotIn, values: ["never-used-value"] }
+      # attributes:
+      #   communities:
+      #     standard: ["65000:100"]
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPPeerConfig
+metadata:
+  name: l3-bgp-peer-config
+spec:
+  timers:
+    holdTimeSeconds: 9
+    keepAliveTimeSeconds: 3
+  gracefulRestart:
+    enabled: true
+    restartTimeSeconds: 15
+  families:
+    - afi: ipv4
+      safi: unicast
+      advertisements:
+        matchLabels:
+          advertise: bgp
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPClusterConfig
+metadata:
+  name: l3-bgp-cluster-config
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux
+  bgpInstances:
+    - name: "instance-64513"
+      localASN: 64513
+      localPort: 179
+      peers:
+        - name: "r0"
+          peerAddress: 10.10.130.1
+          peerASN: 64512
+          peerConfigRef:
+            name: l3-bgp-peer-config
