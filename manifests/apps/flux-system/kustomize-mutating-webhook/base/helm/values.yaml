@@ -116,7 +116,7 @@ configMaps:
 
 # -- Secrets to mount into the webhook container for substitution variables
 secrets:
-  - name: cluster-settings
+  - name: cluster-secrets
     optional: false
     create: false
 
