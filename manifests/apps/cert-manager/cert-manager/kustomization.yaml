@@ -23,3 +23,5 @@ spec:
   dependsOn:
     - name: prometheus-operator-crds
       namespace: monitoring
+    - name: cert-manager-crds
+      namespace: cert-manager

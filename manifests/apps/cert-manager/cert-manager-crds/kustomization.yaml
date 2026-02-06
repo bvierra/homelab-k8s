@@ -3,8 +3,8 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &name kustomize-mutating-webhook
-  namespace: flux-system
+  name: &name cert-manager-crds
+  namespace: cert-manager
 spec:
   interval: 1h
   retryInterval: 2m
@@ -13,11 +13,8 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/flux-system/kustomize-mutating-webhook/base/
+  path: ./manifests/apps/cert-manager/cert-manager-crds/base
   sourceRef:
     kind: GitRepository
     name: homelab
     namespace: flux-system
-  dependsOn:
-    - name: cert-manager-crds
-      namespace: cert-manager
