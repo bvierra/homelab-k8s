@@ -1,7 +1,7 @@
 bpf:
-  datapathMode: netkit
+  #  datapathMode: netkit
   masquerade: true
-  preallocateMaps: true
+#  preallocateMaps: true
 bpfClockProbe: true
 bgpControlPlane:
   enabled: true
@@ -28,9 +28,9 @@ gatewayAPI:
   enableAppProtocol: true
 ipam:
   mode: kubernetes
-k8sServiceHost: 127.0.0.1
+ipv4NativeRoutingCIDR: 10.10.130.0/24
+k8sServiceHost: localhost
 k8sServicePort: 7445
-
 ingressController:
   enabled: true
   default: true
@@ -39,7 +39,7 @@ ingressController:
     annotations:
       io.cilium/lb-ipam-ips: 10.11.100.1
 kubeProxyReplacement: true
-kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+#kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
 l2announcements:
   enabled: false
 loadBalancer:
@@ -52,17 +52,17 @@ operator:
     enabled: true
   prometheus:
     enabled: true
-    serviceMonitor:
-      enabled: true
+  #    serviceMonitor:
+  #      enabled: true
   replicas: 2
   rollOutPods: true
 pmtuDiscovery:
   enabled: true
 prometheus:
   enabled: true
-  serviceMonitor:
-    enabled: true
-    trustCRDsExist: true
+#  serviceMonitor:
+#    enabled: true
+#    trustCRDsExist: true
 rollOutCiliumPods: true
 routingMode: native
 securityContext:
