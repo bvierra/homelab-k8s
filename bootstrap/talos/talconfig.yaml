@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bvierra/talhelper/refs/heads/master/pkg/config/schemas/talconfig.json
+# yaml-language-server: $schema=http://raw.githubusercontent.com/budimanjojo/talhelper/refs/heads/master/pkg/config/schemas/talconfig.json
 ---
 clusterName: k8s
 talosVersion: v1.12.2
@@ -257,6 +257,8 @@ nodes:
 
 patches:
   - "@./patches/global/machine-features.yaml"
+  - "@./patches/cilium-install.yaml"
+  - "@./patches/cilium-values.yaml"
 
 controlPlane:
   schematic:
@@ -281,9 +283,7 @@ controlPlane:
     - "@./patches/cp/cluster-extramanifests.yaml"
     - "@./patches/cp/cluster-network.yaml"
     - "@./patches/cp/cluster-proxy.yaml"
-    - "@./patches/cp/machine-features.yaml"
-    - "@./patches/cilium-install.yaml"
-    - "@./patches/cilium-values.yaml"
+    - "@./patches/cp/cluster-scheduler.yaml"
 
 worker:
   schematic:

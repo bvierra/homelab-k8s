@@ -81,7 +81,7 @@ cluster:
                   command:
                     - cilium
                     - install
-                    - --version=v1.18.6
+                    - --version=v1.19.0
                     - --values
                     - /root/app/values.yaml
               volumes:
