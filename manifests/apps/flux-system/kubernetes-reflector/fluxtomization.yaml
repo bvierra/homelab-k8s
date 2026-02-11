@@ -13,7 +13,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: kubernetes-reflector
-  path: ./manifests/apps/flux-system/kubernetes-reflector/base
+  path: ./manifests/apps/flux-system/kubernetes-reflector/app
   sourceRef:
     kind: GitRepository
     name: homelab

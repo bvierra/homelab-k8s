@@ -5,6 +5,8 @@ resources:
   - ./cilium.yaml
   - ./democratic-csi.yaml
   - ./emberstack.yaml
+  - ./flux-instance.yaml
+  - ./flux-operator.yaml
   - ./grafana.yaml
   - ./jetstack.yaml
   - ./kube-prometheus-stack.yaml
