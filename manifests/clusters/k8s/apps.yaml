@@ -23,6 +23,16 @@ spec:
         metadata:
           name: _
         spec:
+          decryption:
+            provider: sops
+            secretRef:
+              name: sops-age
+          postBuild:
+            substituteFrom:
+              - kind: ConfigMap
+                name: cluster-settings
+              - kind: Secret
+                name: cluster-secrets
           deletionPolicy: WaitForTermination
           patches:
             - patch: |-
