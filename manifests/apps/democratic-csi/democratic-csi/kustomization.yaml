@@ -13,7 +13,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: democratic-csi
-  path: ./manifests/apps/democratic-csi/democratic-csi/base/
+  path: ./manifests/apps/democratic-csi/democratic-csi/app/
   sourceRef:
     kind: GitRepository
     name: homelab
