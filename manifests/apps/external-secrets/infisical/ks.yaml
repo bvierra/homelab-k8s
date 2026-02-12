@@ -3,16 +3,19 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: infisical
+  name: &name infisical
   namespace: external-secrets
-namespace: external-secrets
 spec:
   interval: 1h
-  path: ./manifests/apps/external-secrets/infisical/app
+  retryInterval: 2m
+  timeout: 5m
   prune: true
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *name
+  path: ./manifests/apps/external-secrets/infisical/app
   sourceRef:
     kind: GitRepository
     name: homelab
     namespace: flux-system
   targetNamespace: external-secrets
-  wait: true
