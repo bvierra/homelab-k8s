@@ -5,10 +5,8 @@ kind: Kustomization
 metadata:
   name: flux-system
 namespace: flux-system
-components:
-  - ../../components/namespace
-
 resources:
+  - ./namespace.yaml
   - ./kubernetes-reflector/fluxtomization.yaml
   - ./flux-operator/kustomization.yaml
   - ./flux-instance/kustomization.yaml
