@@ -23,10 +23,10 @@ spec:
         metadata:
           name: _
         spec:
-          decryption:
-            provider: sops
-            secretRef:
-              name: sops-age
+          # decryption:
+          #   provider: sops
+          #   secretRef:
+          #     name: sops-age
           postBuild:
             substituteFrom:
               - kind: ConfigMap
