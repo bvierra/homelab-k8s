@@ -10,13 +10,16 @@ helmDefaults:
     - --no-hooks
 
 releases:
-  - name: cert-manager
+  - name: cert-manager-operator-crds
     namespace: cert-manager
     chart: oci://quay.io/jetstack/charts/cert-manager
     version: 1.19.2
+    set:
+      - name: crds.enabled
+        value: true
 
-  - name: grafana-operator
-    namespace: observability
+  - name: grafana-operator-crds
+    namespace: monitoring
     chart: oci://ghcr.io/grafana/helm-charts/grafana-operator
     version: 5.21.4
 
