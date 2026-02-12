@@ -5,6 +5,7 @@ kind: Kustomization
 metadata:
   name: external-secrets
   namespace: external-secrets
+namespace: external-secrets
 resources:
   - ./grafanadashboard.yaml
   - ./helmrelease.yaml
