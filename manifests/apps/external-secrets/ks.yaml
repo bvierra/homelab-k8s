@@ -2,13 +2,14 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: external-secrets
 metadata:
-  name: external-secrets
+  name: namespace-external-secrets
   namespace: external-secrets
+  labels:
+    manifests.vierra.host/file-location: "manifests_apps_external-secrets_ks.yaml"
+namespace: external-secrets
 components:
   - ../../components/namespace
-
 resources:
   - ./external-secrets/ks.yaml
   - ./infisical/ks.yaml
