@@ -37,6 +37,7 @@ securityContext:
   capabilities:
     ciliumAgent:
       [
+        CAP_NET_BIND_SERVICE,
         CHOWN,
         KILL,
         NET_ADMIN,
@@ -49,4 +50,4 @@ securityContext:
         SETGID,
         SETUID,
       ]
-    cleanCiliumState: [NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
+    cleanCiliumState: [CAP_NET_BIND_SERVICE, NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]

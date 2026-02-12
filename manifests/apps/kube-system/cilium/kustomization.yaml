@@ -4,7 +4,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &name cilium
-  namespace: &namespace flux-system
+  namespace: &namespace kube-system
 spec:
   commonMetadata:
     labels:
@@ -36,7 +36,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &name cilium-config
-  namespace: &namespace flux-system
+  namespace: &namespace kube-system
 spec:
   commonMetadata:
     labels:
@@ -67,7 +67,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &name cilium-gateway
-  namespace: &namespace flux-system
+  namespace: &namespace kube-system
 spec:
   commonMetadata:
     labels:

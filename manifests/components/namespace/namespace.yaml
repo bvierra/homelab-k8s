@@ -5,7 +5,8 @@ kind: Namespace
 metadata:
   # make sure the component called kustomization
   # has `namespace` field filled
-  name: to-be-replaced
+  name: _
   annotations:
     reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
     reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ""
+    kustomize.toolkit.fluxcd.io/prune: "disabled"

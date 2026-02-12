@@ -8,8 +8,10 @@ metadata:
   labels:
     manifests.vierra.host/file-location: "manifests_apps_cert-manager_cert-manager_base_kustomization.yaml"
 resources:
-  - ./cloudflare/secret.sops.yaml
+  - ./secret.sops.yaml
+  - ./externalsecret.yaml
   - ./helmrelease.yaml
+  - ./clusterissuer.yaml
   - ./referencegrant.yaml
 configMapGenerator:
   - name: cert-manager-values
