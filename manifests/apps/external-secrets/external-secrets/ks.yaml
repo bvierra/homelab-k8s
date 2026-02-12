@@ -5,8 +5,6 @@ kind: Kustomization
 metadata:
   name: &name external-secrets
   namespace: external-secrets
-  labels:
-    "manifests.vierra.host/file-location": "manifests_apps_external-secrets_external-secrets_kustomization.yaml"
 spec:
   interval: 1h
   retryInterval: 2m
