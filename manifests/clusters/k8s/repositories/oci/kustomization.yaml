@@ -5,6 +5,7 @@ resources:
   - ./cilium.yaml
   - ./democratic-csi.yaml
   - ./emberstack.yaml
+  - ./external-secrets.yaml
   - ./flux-instance.yaml
   - ./flux-operator.yaml
   - ./grafana.yaml
