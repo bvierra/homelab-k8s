@@ -6,7 +6,7 @@ metadata:
   name: external-secrets
   namespace: external-secrets
 resources:
-  - ./grafanadashboard.yaml
+  #- ./grafanadashboard.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
   #- ./pdb.yaml
