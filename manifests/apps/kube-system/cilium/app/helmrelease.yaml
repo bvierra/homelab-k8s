@@ -22,3 +22,4 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: cilium-values
+  targetNamespace: kube-system
