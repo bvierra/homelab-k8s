@@ -5,7 +5,6 @@ kind: Kustomization
 metadata:
   name: external-secrets
   namespace: external-secrets
-namespace: external-secrets
 spec:
   interval: 1h
   path: ./manifests/apps/external-secrets/external-secrets/app
