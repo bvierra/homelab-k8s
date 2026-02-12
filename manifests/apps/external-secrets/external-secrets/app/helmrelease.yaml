@@ -14,4 +14,3 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: external-secrets-values
-      namespace: external-secrets

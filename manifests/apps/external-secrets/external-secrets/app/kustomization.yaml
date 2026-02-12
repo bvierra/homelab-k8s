@@ -12,6 +12,7 @@ resources:
   - ./pdb.yaml
 configMapGenerator:
   - name: external-secrets-values
+    namespace: external-secrets
     files:
       - values.yaml=./helm/values.yaml
 configurations:
