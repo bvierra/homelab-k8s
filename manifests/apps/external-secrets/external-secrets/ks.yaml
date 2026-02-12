@@ -3,14 +3,21 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: external-secrets
+  name: &name external-secrets
+  namespace: external-secrets
+  labels:
+    "manifests.vierra.host/file-location": "manifests_apps_external-secrets_external-secrets_kustomization.yaml"
 spec:
   interval: 1h
-  path: ./manifests/apps/external-secrets/external-secrets/app
+  retryInterval: 2m
+  timeout: 5m
   prune: true
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *name
+  path: ./manifests/apps/external-secrets/external-secrets/app
   sourceRef:
     kind: GitRepository
     name: homelab
     namespace: flux-system
   targetNamespace: external-secrets
-  wait: true
