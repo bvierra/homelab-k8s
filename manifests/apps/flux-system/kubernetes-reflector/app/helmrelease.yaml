@@ -10,7 +10,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: emberstack
-    namespace: flux-system
   upgrade:
     cleanupOnFail: true
     remediation:

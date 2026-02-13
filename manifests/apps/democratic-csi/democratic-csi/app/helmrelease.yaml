@@ -10,7 +10,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: democratic-csi
-    namespace: flux-system
   upgrade:
     cleanupOnFail: true
     remediation:

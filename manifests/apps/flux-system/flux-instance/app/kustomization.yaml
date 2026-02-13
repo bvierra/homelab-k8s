@@ -5,6 +5,8 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - ./helmrelease.yaml
+  - ./ocirepository.yaml
+  - ./gitrepository.yaml
 configMapGenerator:
   - name: flux-instance-values
     files:
