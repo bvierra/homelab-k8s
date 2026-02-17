@@ -8,6 +8,7 @@ metadata:
   labels:
     manifests.vierra.host/file-location: "manifests_apps_cert-manager_cert-manager_base_kustomization.yaml"
 resources:
+  - ./ocirepository.yaml
   - ./secret.sops.yaml
   - ./externalsecret.yaml
   - ./helmrelease.yaml
