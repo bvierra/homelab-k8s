@@ -80,6 +80,15 @@ releases:
         events:
           - postsync
         showlogs: true
+      - command: kubectl
+        args:
+          - apply
+          - --server-side
+          - --namespace=external-secrets
+          - --filename=../../manifests/components/namespace/replicated-resources.yaml
+        events:
+          - postsync
+        showlogs: true
   # - name: kubernetes-reflector
   #   namespace: flux-system
   #   chart: oci://ghcr.io/emberstack/helm-charts/reflector
@@ -127,3 +136,22 @@ releases:
       - ./templates/values.yaml.gotmpl
     needs:
       - flux-system/flux-operator
+    hooks:
+      - command: kubectl
+        args:
+          - apply
+          - --server-side
+          - --namespace=flux-system
+          - --filename=../../manifests/apps/flux-system/flux-instance/app/gitrepository.yaml
+        events:
+          - postsync
+        showlogs: true
+      - command: kubectl
+        args:
+          - apply
+          - --server-side
+          - --namespace=flux-system
+          - --filename=../../manifests/clusters/k8s/vars/cluster-settings.yaml
+        events:
+          - postsync
+        showlogs: true

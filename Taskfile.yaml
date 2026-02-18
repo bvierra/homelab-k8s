@@ -18,9 +18,9 @@ env:
   KUBECONFIG: "{{ .HOME }}/.kube/config"
 
 vars:
-  MANIFESTS_DIR: "{{ .ROOT_TASKFILE }}/manifests"
-  SOPS_SERVER_AGE_KEY_FILE: "{{ .ROOT_TASKFILE }}/artifacts/sops/server/server.privkey"
-  SOPS_AGE_KEY_FILE: "{{ .ROOT_TASKFILE }}/artifacts/sops/user/user.privkey"
+  MANIFESTS_DIR: "{{ .ROOT_DIR }}/manifests"
+  SOPS_SERVER_AGE_KEY_FILE: "{{ .ROOT_DIR }}/artifacts/sops/server/server.privkey"
+  SOPS_AGE_KEY_FILE: "{{ .ROOT_DIR }}/artifacts/sops/user/user.privkey"
 
 tasks:
   default: task --list
@@ -43,6 +43,26 @@ tasks:
               ntfy_alert.sh --topic "k8s" --title "talos-recreate failed" --message "Task talos-recreate failed" -at "fail"
             {{else}}
               ntfy_alert.sh --topic "k8s" --title "talos-recreate completed" --message "Talos infrastructure has been re-created successfully" -at "pass"
+            {{end}}
+          {{ end }}
+
+  k8s-recreate:
+    desc: Destroy and recreate Kubernetes cluster
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - task: talos:fullresetandbootstrap
+        vars:
+          SUPPRESS_ALERT: true
+      #      - task: flux-install
+      #        vars:
+      #          SUPPRESS_ALERT: true
+      - defer: |
+          {{ if .SUPPRESS_ALERT | contains "false" }}
+            {{ if .EXIT_CODE }}
+              ntfy_alert.sh --topic "k8s" --title "k8s-recreate failed" --message "Task k8s-recreate failed" -at "fail"
+            {{else}}
+              ntfy_alert.sh --topic "k8s" --title "k8s-recreate completed" --message "Kubernetes cluster has been re-created successfully" -at "pass"
             {{end}}
           {{ end }}
 
@@ -115,10 +135,35 @@ tasks:
       # TODO: Bettere error messages, include commands to fix
       - sh: test -f {{.SOPS_SERVER_AGE_KEY_FILE}}
         msg: |
-          Server Age key file is not found. Did you forget to create it?
+          Server Age key file is not found( {{.SOPS_SERVER_AGE_KEY_FILE}} ). Did you forget to create it?
       - sh: test -f {{.SOPS_AGE_KEY_FILE}}
         msg: |
           User Age key file is not found. Did you forget to create it?
       # TODO: Figure out how best to have these generated
       - test -f {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-secrets.secret.sops.yaml
       - test -f {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-settings.yaml
+
+  cilium-test:
+    desc: Run Cilium connectivity test
+    cmds:
+      - cilium connectivity test --namespace-labels "pod-security.kubernetes.io/enforce=privileged,pod-security.kubernetes.io/audit=privileged,pod-security.kubernetes.io/warn=privileged"
+
+  k8s-approve-csrs:
+    desc: Approve all pending CSRs in the cluster
+    cmds:
+      #- kubectl get csr --no-headers | awk '/Pending/ {print $1}' | xargs -r kubectl certificate approve
+      - kubectl get csr | grep Pending | awk -F' ' '{ print $1 }' | xargs -n 1 kubectl certificate approve
+
+  bootstrap-crds:
+    desc: Apply CRD-only helmfile
+    cmds:
+      - helmfile -f bootstrap/helmfile.d/00-crds.yaml template -q | yq ea -e 'select(.kind == "CustomResourceDefinition")' | kubectl apply --server-side --field-manager bootstrap --force-conflicts -f -
+
+  bootstrap-apps:
+    desc: Apply apps helmfile
+    cmds:
+      - kubectl create namespace flux-system --dry-run=client -o yaml | kubectl apply -f - || true
+      - sops --decrypt {{.MANIFESTS_DIR}}/clusters/k8s/vars/cluster-secrets.secret.sops.yaml | kubectl apply --filename - || true
+      - cat {{.SOPS_SERVER_AGE_KEY_FILE}} | kubectl -n flux-system create secret generic sops-age --from-file=keys.agekey=/dev/stdin || true
+      - kubectl -n flux-system annotate secret sops-age "reflector.v1.k8s.emberstack.com/reflection-allowed=true" 'reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces'=""
+      - helmfile -f bootstrap/helmfile.d/01-apps.yaml sync
