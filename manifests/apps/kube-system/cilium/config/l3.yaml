@@ -7,10 +7,10 @@ metadata:
     advertise: bgp
 spec:
   advertisements:
-    - advertisementType: "PodCIDR"
-      attributes:
-        communities:
-          standard: ["65000:99"]
+    # - advertisementType: "PodCIDR"
+    #   attributes:
+    #     communities:
+    #       standard: ["65000:99"]
     - advertisementType: "Service"
       service:
         addresses: # <--- specify the service types to advertise
