@@ -8,7 +8,11 @@ cgroup:
   hostRoot: /sys/fs/cgroup
 endpointRoutes:
   enabled: true
-
+envoy:
+  enabled: true
+  securityContext:
+    capabilities:
+      keepCapNetBindService: true
 externalIPs:
   enabled: true
 gatewayAPI:
