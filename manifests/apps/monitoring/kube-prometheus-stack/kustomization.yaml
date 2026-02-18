@@ -13,7 +13,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/monitoring/kube-prometheus-stack/base/
+  path: ./manifests/apps/monitoring/kube-prometheus-stack/app/
   sourceRef:
     kind: GitRepository
     name: homelab
