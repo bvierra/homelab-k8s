@@ -5,6 +5,7 @@ metadata:
   name: kube-prometheus-stack
   namespace: monitoring
 resources:
+  - ./ocirepository.yaml
   - ./externalsecret.yaml
   - ./helmrelease.yaml
 configMapGenerator:
