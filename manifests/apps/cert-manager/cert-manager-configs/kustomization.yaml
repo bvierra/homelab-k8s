@@ -13,7 +13,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/cert-manager/cert-manager-configs/base
+  path: ./manifests/apps/cert-manager/cert-manager-configs/app
   sourceRef:
     kind: GitRepository
     name: homelab
