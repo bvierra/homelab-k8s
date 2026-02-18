@@ -7,6 +7,7 @@ metadata:
 resources:
   - ./ocirepository.yaml
   - ./externalsecret.yaml
+  - ./externalsecret-cf.yaml
   - ./helmrelease.yaml
 configMapGenerator:
   - name: kube-prometheus-stack-values
