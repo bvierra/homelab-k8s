@@ -34,7 +34,7 @@ ingressController:
 # https://docs.cilium.io/en/stable/network/concepts/ipam/
 ipam:
   mode: kubernetes
-#ipv4NativeRoutingCIDR: 10.10.130.0/24
+ipv4NativeRoutingCIDR: 10.0.0.0/8
 # Talos specific
 # https://www.talos.dev/latest/kubernetes-guides/configuration/kubeprism/
 k8sServiceHost: localhost
