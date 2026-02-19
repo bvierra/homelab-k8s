@@ -14,7 +14,6 @@ spec:
     - advertisementType: "Service"
       service:
         addresses: # <--- specify the service types to advertise
-          - ClusterIP
           - ExternalIP
           - LoadBalancerIP
       selector: # <--- select all services
