@@ -1,6 +1,6 @@
 bgpControlPlane:
   enabled: true
-devices: "eth0 ens18"
+devices: eth0
 
 cgroup:
   autoMount:
@@ -63,3 +63,16 @@ securityContext:
         SETUID,
       ]
     cleanCiliumState: [NET_BIND_SERVICE, NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
+
+######
+# L2 Announcements
+######
+l2announcements:
+  enabled: true
+  leaseDuration: 3s
+  leaseRenewDeadline: 1s
+  leaseRetryPeriod: 200ms
+
+k8sClientRateLimit:
+  qps: 100
+  burst: 200
