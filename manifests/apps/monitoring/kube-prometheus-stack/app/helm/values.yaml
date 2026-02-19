@@ -1342,7 +1342,7 @@ grafana:
       ingress.cilium.io/loadbalancer-mode: "dedicated"
       ingress.cilium.io/service-type: "LoadBalancer"
       ingress.cilium.io/force-https: "true"
-      lbipam.cilium.io/ips: "10.11.100.10"
+      lbipam.cilium.io/ips: "10.11.100.19"
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
 
