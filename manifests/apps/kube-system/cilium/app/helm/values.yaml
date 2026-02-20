@@ -24,6 +24,12 @@ gatewayAPI:
   enabled: true
   enableAlpn: true
   enableAppProtocol: true
+hubble:
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+
 ingressController:
   enabled: true
   default: true
