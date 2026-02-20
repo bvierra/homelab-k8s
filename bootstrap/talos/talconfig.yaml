@@ -257,8 +257,9 @@ nodes:
 
 patches:
   - "@./patches/global/machine-features.yaml"
-  - "@./patches/cilium-install.yaml"
-  - "@./patches/cilium-values.yaml"
+  #- "@./patches/global/machine-network-routes.yaml"
+#  - "@./patches/cilium-install.yaml"
+#  - "@./patches/cilium-values.yaml"
 
 controlPlane:
   schematic:

@@ -47,8 +47,12 @@ tasks:
       SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
     cmds:
       - task: fullreset
+        vars:
+          SUPPRESS_ALERT: true
       - sleep 5
       - task: setupCluster
+        vars:
+          SUPPRESS_ALERT: true
       - defer: |
           {{ if .SUPPRESS_ALERT | contains "false" }}
             {{ if .EXIT_CODE }}
