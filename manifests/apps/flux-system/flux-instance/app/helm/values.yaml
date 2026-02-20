@@ -12,7 +12,7 @@ instance:
     kind: GitRepository
     url: https://github.com/bvierra/homelab-k8s
     ref: refs/heads/main
-    path: manifests/flux/cluster
+    path: manifests/apps
     interval: 1h
   kustomize:
     patches:
