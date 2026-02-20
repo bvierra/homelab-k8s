@@ -1,0 +1,50 @@
+domainFilters:
+  - vierra.host
+image.repository: "registry.k8s.io/external-dns/external-dns"
+# interval for dns updates, default is 1m
+interval: 1m
+revisionHistoryLimit: 3
+
+provider:
+  name: rfc2136
+extraArgs:
+  - --rfc2136-host=10.10.130.2
+  - --rfc2136-port=53
+  - --rfc2136-zone=vierra.host
+  - --rfc2136-tsig-secret-alg=hmac-sha256
+  - --rfc2136-tsig-axfr
+env:
+  - name: "EXTERNAL_DNS_RFC2136_TSIG_SECRET"
+    valueFrom:
+      secretKeyRef:
+        name: technitium-tsig
+        key: shared-secret
+  - name: "EXTERNAL_DNS_RFC2136_TSIG_KEYNAME"
+    valueFrom:
+      secretKeyRef:
+        name: technitium-tsig
+        key: key-name
+
+# -- Specify the registry for storing ownership and labels.
+# Valid values are `txt`, `aws-sd`, `dynamodb` & `noop`.
+registry: txt
+# Identifier to distinguish between multiple external-dns instances, default is null
+txtOwnerId:
+# Identifier to use for TXT records that is prepended to the record name, default is null
+# Mutually exclusive with txtSuffix
+txtPrefix: "k8s-dns-technitium"
+# Identifier to use for TXT records that is appended to the record name, default is null
+# Mutually exclusive with txtPrefix
+txtSuffix:
+
+# -- How DNS records are synchronized between sources and providers; available values are `create-only`, `sync`, & `upsert-only`.
+policy: upsert-only
+
+# -- Filter resources queried for endpoints by label selector.
+labelFilter: # @schema type: [string,null]; default: null
+
+# -- Filter resources queried for endpoints by annotation selector.
+annotationFilter: # @schema type: [string,null]; default: null
+
+# -- Annotation prefix for external-dns annotations (useful for split horizon DNS with multiple instances).
+annotationPrefix: # @schema type: [string,null]; default: null
