@@ -1,3 +1,4 @@
+installCRDs: true
 serviceMonitor:
   create: true
 web:
