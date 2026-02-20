@@ -6,3 +6,4 @@ namespace: kube-system
 resources:
   - ./replicated-resources.yaml
   - ./cilium/kustomization.yaml
+  - ./external-dns/ks.yaml
