@@ -8,5 +8,6 @@ namespace: monitoring
 components:
   - ../../components/namespace-privileged
 resources:
+  - ./replicated-resources.yaml
   - ./kube-prometheus-stack/kustomization.yaml
   - ./prometheus-operator-crds/kustomization.yaml
