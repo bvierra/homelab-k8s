@@ -40,7 +40,7 @@ ingressController:
 # https://docs.cilium.io/en/stable/network/concepts/ipam/
 ipam:
   mode: kubernetes
-ipv4NativeRoutingCIDR: 10.0.0.0/8
+# ipv4NativeRoutingCIDR: 10.0.0.0/8
 # Talos specific
 # https://www.talos.dev/latest/kubernetes-guides/configuration/kubeprism/
 k8sServiceHost: localhost
@@ -69,16 +69,15 @@ securityContext:
         SETUID,
       ]
     cleanCiliumState: [NET_BIND_SERVICE, NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
-
 ######
 # L2 Announcements
 ######
-l2announcements:
-  enabled: true
-  leaseDuration: 3s
-  leaseRenewDeadline: 1s
-  leaseRetryPeriod: 200ms
+# l2announcements:
+#   enabled: true
+#   leaseDuration: 3s
+#   leaseRenewDeadline: 1s
+#   leaseRetryPeriod: 200ms
 
-k8sClientRateLimit:
-  qps: 100
-  burst: 200
+# k8sClientRateLimit:
+#   qps: 100
+# burst: 200
