@@ -62,6 +62,8 @@ releases:
     version: 2.0.0
     values:
       - ./templates/values.yaml.gotmpl
+    needs:
+      - kube-system/cilium
     hooks:
       - # Wait for cert-manager to be ready before applying the chart, since external-secrets has a dependency on cert-manager. We can't use helmfile's built-in dependency management for this since cert-manager is in a different namespace, and helmfile doesn't support cross-namespace dependencies.
         command: bash
@@ -89,35 +91,6 @@ releases:
         events:
           - postsync
         showlogs: true
-  # - name: kubernetes-reflector
-  #   namespace: flux-system
-  #   chart: oci://ghcr.io/emberstack/helm-charts/reflector
-  #   version: 10.0.2
-  #   values:
-  #     - ./templates/values.yaml.gotmpl
-  #   hooks:
-  #     - # create ns
-  #       command: bash
-  #       args:
-  #         - -c
-  #         - kubectl create namespace flux-system | true
-  #       events:
-  #         - presync
-  #     - # create sops-age secret before applying the chart, since the chart has a pre-install hook that requires it. We can't use helmfile's built-in secret management for this since we need to create the secret before the chart is applied, and helmfile doesn't guarantee that secrets will be applied before the chart.
-  #       command: bash
-  #       args:
-  #         - -c
-  #         - cat ../../artifacts/sops/server/server.privkey | kubectl -n flux-system create secret generic sops-age --from-file=keys.agekey=/dev/stdin || true
-  #       events:
-  #         - presync
-  #       showlogs: true
-  #     - command: bash
-  #       args:
-  #         - -c
-  #         - kubectl -n flux-system annotate secret sops-age "reflector.v1.k8s.emberstack.com/reflection-allowed=true" 'reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces'=""
-  #       events:
-  #         - presync
-  #       showlogs: true
 
   - name: flux-operator
     namespace: flux-system

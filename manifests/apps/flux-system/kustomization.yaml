@@ -10,4 +10,4 @@ resources:
   - ./kubernetes-reflector/fluxtomization.yaml
   - ./flux-operator/kustomization.yaml
   - ./flux-instance/kustomization.yaml
-  #- ./kustomize-mutating-webhook/kustomization.yaml
+  - ./kustomize-mutating-webhook/kustomization.yaml

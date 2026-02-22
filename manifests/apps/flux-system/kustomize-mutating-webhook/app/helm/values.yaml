@@ -9,7 +9,7 @@ image:
   # -- Image pull policy
   pullPolicy: Always
   # -- Image tag (overrides the image tag whose default is the chart appVersion)
-  tag: "main-fee1c33"
+  tag: "0.7.0"
 
 # -- Secrets for pulling images from private registries
 imagePullSecrets: []
@@ -100,12 +100,6 @@ certManager:
   CASClusterIssuer:
     # -- Enable AWS Private CA or Google CAS cluster issuer
     enabled: false
-    # -- API group for the CAS issuer (awspca.cert-manager.io or cas-issuer.jetstack.io)
-    group: "awspca.cert-manager.io" # cas-issuer.jetstack.io|awspca.cert-manager.io
-    # -- Kind of CAS issuer (AWSPCAClusterIssuer or GoogleCASClusterIssuer)
-    kind: "AWSPCAClusterIssuer" # GoogleCASClusterIssuer|AWSPCAClusterIssuer
-    # -- Name of the CAS cluster issuer
-    name: casissuer-name
 
 # -- ConfigMaps to mount into the webhook container for substitution variables
 configMaps:

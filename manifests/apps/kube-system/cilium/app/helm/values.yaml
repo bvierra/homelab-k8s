@@ -48,6 +48,7 @@ k8sServicePort: 7445
 kubeProxyReplacement: true
 loadBalancer:
   algorithm: maglev
+  mode: dsr
 operator:
   rollOutPods: true
 rollOutCiliumPods: true
@@ -69,6 +70,15 @@ securityContext:
         SETUID,
       ]
     cleanCiliumState: [NET_BIND_SERVICE, NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
+
+#######
+# Native Routing
+# Also loadBalancer.mode
+#######
+autoDirectNodeRoutes: true
+tunnel: disabled
+enableEndpointRoutes: true
+nativeRoutingCIDR: 10.0.0.0/8
 ######
 # L2 Announcements
 ######
