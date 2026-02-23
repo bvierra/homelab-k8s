@@ -75,10 +75,10 @@ securityContext:
 # Native Routing
 # Also loadBalancer.mode
 #######
-autoDirectNodeRoutes: true
+#autoDirectNodeRoutes: true
 enableEndpointRoutes: true
-routingMode: native
-ipv4NativeRoutingCIDR: 10.10.0.0/16
+#routingMode: native
+#ipv4NativeRoutingCIDR: 10.10.0.0/16
 ######
 # L2 Announcements
 ######
