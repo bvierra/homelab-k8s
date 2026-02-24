@@ -1,7 +1,5 @@
-installCRDs: true
 serviceMonitor:
   create: true
 web:
   networkPolicy:
     create: false
-PersistentClient: false
