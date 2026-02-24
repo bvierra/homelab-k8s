@@ -1,0 +1,26 @@
+# yaml-language-server: https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.35.1/ingress.json
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flux-web
+  namespace: flux-system
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-stage"
+spec:
+  ingressClassName: "cilium"
+  rules:
+    - host: "flux.k8s.vierra.host"
+      http:
+        paths:
+          - backend:
+              service:
+                name: flux-operator
+                port:
+                  name: http-web
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - "flux.k8s.vierra.host"
+      secretName: flux-web-tls
