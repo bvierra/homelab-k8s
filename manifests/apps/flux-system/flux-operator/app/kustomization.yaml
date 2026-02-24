@@ -5,8 +5,8 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
-  # - ./httproute.yaml
-  - ./ingress.yaml
+  - ./httproute.yaml
+  # - ./ingress.yaml
 configMapGenerator:
   - name: flux-operator-values
     files:
