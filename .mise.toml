@@ -1,0 +1,24 @@
+[env]
+_.file = ".env"
+SOPS_AGE_KEY_FILE="{{config_root}}/artifacts/sops/user/user.privkey"
+
+[tools]
+"aqua:cilium/hubble" = "latest"
+"aqua:kubernetes-sigs/gwctl" = "latest"
+"aqua:kubernetes-sigs/ingress2gateway" = "latest"
+"github:budimanjojo/talhelper" = "latest"
+"github:controlplaneio-fluxcd/flux-operator" = { version = "latest", asset_pattern = "flux-operator_*_linux_amd64.tar.gz" }
+"github:dgunzy/flux9s" = "latest"
+"github:tilt-dev/tilt" = "latest"
+helm = "3.20.0"
+helmfile = "latest"
+jj = "latest"
+jq = "latest"
+kubeconform = "latest"
+kubectl = "latest"
+kustomize = "latest"
+rg = "latest"
+sops = "latest"
+talosctl = "latest"
+task = "latest"
+yq = "latest"
