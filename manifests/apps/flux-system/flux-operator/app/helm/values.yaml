@@ -4,3 +4,4 @@ serviceMonitor:
 web:
   networkPolicy:
     create: false
+PersistentClient: false

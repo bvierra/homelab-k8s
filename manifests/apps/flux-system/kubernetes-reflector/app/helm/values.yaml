@@ -3,7 +3,6 @@ image:
   repository: docker.io/emberstack/kubernetes-reflector
   pullPolicy: IfNotPresent
 
-
 cron:
   enabled: false
 
