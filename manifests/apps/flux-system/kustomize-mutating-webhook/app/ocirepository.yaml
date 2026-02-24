@@ -4,6 +4,7 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: kustomize-mutating-webhook
+  namespace: flux-system
 spec:
   interval: 15m
   url: oci://ghcr.io/xunholy/charts/kustomize-mutating-webhook
