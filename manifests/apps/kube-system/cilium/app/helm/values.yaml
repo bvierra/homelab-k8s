@@ -78,16 +78,16 @@ securityContext:
 autoDirectNodeRoutes: true
 enableEndpointRoutes: true
 routingMode: native
-ipv4NativeRoutingCIDR: 10.0.0.0/8
+ipv4NativeRoutingCIDR: 172.30.0.0/16
 ######
 # L2 Announcements
 ######
-# l2announcements:
-#   enabled: true
-#   leaseDuration: 3s
-#   leaseRenewDeadline: 1s
-#   leaseRetryPeriod: 200ms
+l2announcements:
+  enabled: true
+  leaseDuration: 3s
+  leaseRenewDeadline: 1s
+  leaseRetryPeriod: 200ms
 
-# k8sClientRateLimit:
-#   qps: 100
-# burst: 200
+k8sClientRateLimit:
+  qps: 100
+  burst: 200
