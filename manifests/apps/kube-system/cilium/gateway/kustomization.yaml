@@ -5,3 +5,4 @@ resources:
   - ./external.yaml
   - ./internal.yaml
   - ./redirect.yaml
+  - ./secret-wildcard-k8s.yaml
