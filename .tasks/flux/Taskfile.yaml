@@ -72,3 +72,8 @@ tasks:
     desc: Get Current Kustomization Statuses
     cmds:
       - kubectl get kustomization -n flux-system
+
+  manual-install:
+    desc: Manually install Flux using the CLI, useful for development and testing
+    cmds:
+      - flux bootstrap github --namespace=flux-system --components=source-controller,kustomize-controller,helm-controller,notification-controller --network-policy=false --owner=bvierra --repository=homelab-k8s --branch=main --path=manifests/clusters/k8s --personal --private=false

@@ -36,7 +36,7 @@ releases:
           - --namespace=kube-system
           - --server-side
           - --field-manager=kustomize-controller
-          - --filename=../../manifests/apps/kube-system/cilium/config/l3.yaml
+          - --filename=../../manifests/apps/kube-system/cilium/config/l2.yaml
         events:
           - postsync
         showlogs: true
@@ -124,15 +124,15 @@ releases:
     needs:
       - flux-system/kustomize-mutating-webhook
     hooks:
-      # - command: kubectl
-      #   args:
-      #     - apply
-      #     - --server-side
-      #     - --namespace=flux-system
-      #     - --filename=../../manifests/apps/flux-system/flux-instance/app/gitrepository.yaml
-      #   events:
-      #     - postsync
-      #   showlogs: true
+      - command: kubectl
+        args:
+          - apply
+          - --server-side
+          - --namespace=flux-system
+          - --filename=../../manifests/apps/flux-system/flux-instance/app/gitrepository.yaml
+        events:
+          - postsync
+        showlogs: true
       - command: kubectl
         args:
           - apply
