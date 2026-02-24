@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: wildcard-k8s
-  namespace: cert-manager
+  namespace: kube-system
 spec:
   secretName: wildcard-k8s-tls
   issuerRef:
@@ -12,9 +12,3 @@ spec:
   dnsNames:
     - "k8s.${DOMAIN_0}"
     - "*.k8s.${DOMAIN_0}"
-  secretTemplate:
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ""
-      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "kube-system"
