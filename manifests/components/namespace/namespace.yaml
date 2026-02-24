@@ -6,6 +6,8 @@ metadata:
   # make sure the component called kustomization
   # has `namespace` field filled
   name: _
+  labels:
+    shared-gateway-access: "true"
   annotations:
     reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
     reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ""

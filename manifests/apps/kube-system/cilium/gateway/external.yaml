@@ -20,14 +20,20 @@ spec:
       hostname: "*.k8s.${DOMAIN_0}"
       allowedRoutes:
         namespaces:
-          from: Same
+          from: Selector
+          selector:
+            matchLabels:
+              shared-gateway-access: "true"
     - name: https
       protocol: HTTPS
       port: 443
       hostname: "*.k8s.${DOMAIN_0}"
       allowedRoutes:
         namespaces:
-          from: All
+          from: Selector
+          selector:
+            matchLabels:
+              shared-gateway-access: "true"
       tls:
         certificateRefs:
           - kind: Secret
