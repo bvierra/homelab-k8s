@@ -32,13 +32,13 @@ registry: txt
 txtOwnerId:
 # Identifier to use for TXT records that is prepended to the record name, default is null
 # Mutually exclusive with txtSuffix
-txtPrefix: "k8s-dns-technitium"
+txtPrefix: "k8s-"
 # Identifier to use for TXT records that is appended to the record name, default is null
 # Mutually exclusive with txtPrefix
 txtSuffix:
 
 # -- How DNS records are synchronized between sources and providers; available values are `create-only`, `sync`, & `upsert-only`.
-policy: upsert-only
+policy: sync
 
 # -- Filter resources queried for endpoints by label selector.
 labelFilter: # @schema type: [string,null]; default: null
