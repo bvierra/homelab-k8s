@@ -13,7 +13,7 @@ releases:
   - name: cert-manager-operator-crds
     namespace: cert-manager
     chart: oci://quay.io/jetstack/charts/cert-manager
-    version: 1.19.2
+    version: v1.19.4
     set:
       - name: crds.enabled
         value: true
