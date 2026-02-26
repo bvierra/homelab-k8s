@@ -3,5 +3,11 @@
   "extends": [
     "config:recommended"
   ],
-  "prHourlyLimit": 5
+  "prHourlyLimit": 5,
+  "packageRules": [
+    {
+      "matchPackageNames": ["terraform-provider-minio/minio"],
+      "enabled": false
+    }
+  ]
 }
