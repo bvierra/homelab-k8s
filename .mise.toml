@@ -10,7 +10,7 @@ SOPS_AGE_KEY_FILE="{{config_root}}/artifacts/sops/user/user.privkey"
 "github:controlplaneio-fluxcd/flux-operator" = { version = "latest", asset_pattern = "flux-operator_*_linux_amd64.tar.gz" }
 "github:dgunzy/flux9s" = "latest"
 "github:tilt-dev/tilt" = "latest"
-helm = "3.20.0"
+helm = "4.1.1"
 helmfile = "latest"
 jj = "latest"
 jq = "latest"
