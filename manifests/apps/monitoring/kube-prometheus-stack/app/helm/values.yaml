@@ -1371,7 +1371,7 @@ grafana:
       #      - mon.k8s.vierra.host
       - secretName: wildcard-k8s-tls
         hosts:
-          - "*.k8s.vierra.host"
+          - "mon.k8s.vierra.host"
 
   # # To make Grafana persistent (Using Statefulset)
   # #
