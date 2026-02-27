@@ -8,6 +8,10 @@ revisionHistoryLimit: 3
 provider:
   name: rfc2136
 extraArgs:
+  - --source=gateway-httproute
+  - --source=gateway-tlsroute
+  - --source=gateway-tcproute
+  - --source=gateway-udproute
   - --rfc2136-host=10.10.130.2
   - --rfc2136-port=53
   - --rfc2136-zone=vierra.host
