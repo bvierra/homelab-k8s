@@ -1,4 +1,5 @@
 .env
+.infisical.json
 artifacts/
 bootstrap/talos/clusterconfig/*
 bootstrap/talos/patches/cilium-values.yaml
