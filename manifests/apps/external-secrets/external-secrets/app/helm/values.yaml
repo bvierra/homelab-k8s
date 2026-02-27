@@ -5,3 +5,8 @@ grafanaDashboard:
   enabled: true
 webhook:
   replicaCount: 2
+  serviceMonitor:
+    enabled: true
+certController:
+  serviceMonitor:
+    enabled: true
