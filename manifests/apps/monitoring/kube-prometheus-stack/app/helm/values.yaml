@@ -1337,7 +1337,7 @@ grafana:
       kind: HTTPRoute
 
       annotations:
-        - external-dns.alpha.kubernetes.io/hostname: mon.k8s.vierra.host
+        external-dns.alpha.kubernetes.io/hostname: mon.k8s.vierra.host
 
       labels: {}
 
