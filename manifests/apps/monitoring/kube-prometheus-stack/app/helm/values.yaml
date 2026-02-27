@@ -1336,7 +1336,9 @@ grafana:
       # Valid options are GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute
       kind: HTTPRoute
 
-      annotations: {}
+      annotations:
+        - external-dns.alpha.kubernetes.io/hostname: mon.k8s.vierra.host
+
       labels: {}
 
       hostnames:
