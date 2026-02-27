@@ -8,10 +8,6 @@ revisionHistoryLimit: 3
 provider:
   name: rfc2136
 extraArgs:
-  - --source=gateway-httproute
-  - --source=gateway-tlsroute
-  - --source=gateway-tcproute
-  - --source=gateway-udproute
   - --rfc2136-host=10.10.130.2
   - --rfc2136-port=53
   - --rfc2136-zone=vierra.host
@@ -32,7 +28,10 @@ env:
 sources:
   - service
   - ingress
-  - httproute
+  - gateway-httproute
+  - gateway-tlsroute
+  - gateway-tcproute
+  - gateway-udproute
 
 # -- Specify the registry for storing ownership and labels.
 # Valid values are `txt`, `aws-sd`, `dynamodb` & `noop`.
