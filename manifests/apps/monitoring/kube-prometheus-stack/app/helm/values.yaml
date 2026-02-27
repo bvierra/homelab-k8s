@@ -1325,41 +1325,42 @@ grafana:
     ##
     pspEnabled: false
 
-route:
-  main:
-    # -- Enables or disables the route
-    enabled: true
+  route:
+    main:
+      # -- Enables or disables the route
+      enabled: true
 
-    # -- Set the route apiVersion, e.g. gateway.networking.k8s.io/v1 or gateway.networking.k8s.io/v1alpha2
-    apiVersion: gateway.networking.k8s.io/v1
-    # -- Set the route kind
-    # Valid options are GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute
-    kind: HTTPRoute
+      # -- Set the route apiVersion, e.g. gateway.networking.k8s.io/v1 or gateway.networking.k8s.io/v1alpha2
+      apiVersion: gateway.networking.k8s.io/v1
+      # -- Set the route kind
+      # Valid options are GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute
+      kind: HTTPRoute
 
-    annotations: {}
-    labels: {}
+      annotations: {}
+      labels: {}
 
-    hostnames: []
-    # - my-filter.example.com
-    parentRefs: []
-    # - name: acme-gw
+      hostnames:
+        - mon.k8s.vierra.host
+      parentRefs:
+        - name: external
+          namespace: gateway-system
 
-    matches:
-      - path:
-          type: PathPrefix
-          value: /
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
 
-    ## Filters define the filters that are applied to requests that match this rule.
-    filters: []
+      ## Filters define the filters that are applied to requests that match this rule.
+      filters: []
 
-    ## Additional custom rules that can be added to the route
-    additionalRules: []
+      ## Additional custom rules that can be added to the route
+      additionalRules: []
 
-    ## httpsRedirect adds a filter for redirecting to https (HTTP 301 Moved Permanently).
-    ## To redirect HTTP traffic to HTTPS, you need to have a Gateway with both HTTP and HTTPS listeners.
-    ## Matches and filters do not take effect if enabled.
-    ## Ref. https://gateway-api.sigs.k8s.io/guides/http-redirect-rewrite/
-    httpsRedirect: false
+      ## httpsRedirect adds a filter for redirecting to https (HTTP 301 Moved Permanently).
+      ## To redirect HTTP traffic to HTTPS, you need to have a Gateway with both HTTP and HTTPS listeners.
+      ## Matches and filters do not take effect if enabled.
+      ## Ref. https://gateway-api.sigs.k8s.io/guides/http-redirect-rewrite/
+      httpsRedirect: false
 
   ingress:
     ## If true, Grafana Ingress will be created
