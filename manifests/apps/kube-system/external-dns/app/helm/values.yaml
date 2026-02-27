@@ -31,6 +31,8 @@ sources:
   - gateway-httproute
   - gateway-tlsroute
 
+triggerLoopOnEvent: true
+
 # -- Specify the registry for storing ownership and labels.
 # Valid values are `txt`, `aws-sd`, `dynamodb` & `noop`.
 registry: txt
