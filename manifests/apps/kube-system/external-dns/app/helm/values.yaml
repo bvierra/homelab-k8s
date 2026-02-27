@@ -30,8 +30,6 @@ sources:
   - ingress
   - gateway-httproute
   - gateway-tlsroute
-  - gateway-tcproute
-  - gateway-udproute
 
 # -- Specify the registry for storing ownership and labels.
 # Valid values are `txt`, `aws-sd`, `dynamodb` & `noop`.
