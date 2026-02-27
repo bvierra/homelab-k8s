@@ -18,6 +18,10 @@ envoy:
         - PERFMON
         - BPF
         - NET_BIND_SERVICE
+  prometheus:
+    serviceMonitor:
+      enabled: true
+
 externalIPs:
   enabled: true
 gatewayAPI:
@@ -26,6 +30,8 @@ gatewayAPI:
   enableAppProtocol: true
 hubble:
   relay:
+    enabled: true
+  metrics:
     enabled: true
   ui:
     enabled: true
@@ -60,6 +66,9 @@ loadBalancer:
   mode: dsr
 operator:
   rollOutPods: true
+  prometheus:
+    serviceMonitor:
+      enabled: true
 rollOutCiliumPods: true
 securityContext:
   capabilities:
@@ -79,6 +88,13 @@ securityContext:
         SETUID,
       ]
     cleanCiliumState: [NET_BIND_SERVICE, NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
+
+######
+# Monitoring
+######
+promethus:
+  serviceMonitor:
+    enabled: true
 
 #######
 # Native Routing
