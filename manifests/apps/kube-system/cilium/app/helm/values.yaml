@@ -29,6 +29,15 @@ hubble:
     enabled: true
   ui:
     enabled: true
+    httpRoute:
+      enabled: true
+      # Optional: specify your hostname
+      hostnames:
+        - "hubble.k8s.${DOMAIN_0}"
+      # Optional: specify your parent gateway
+      parentRefs:
+        - name: "external"
+          namespace: "gateway-system"
 
 ingressController:
   enabled: true
