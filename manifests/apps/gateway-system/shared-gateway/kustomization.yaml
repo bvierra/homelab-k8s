@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://schemas.budimanjojo.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &name shared-gateway
+  namespace: &namespace gateway-system
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *name
+  interval: 1h
+  path: ./manifests/apps/gateway-system/shared-gateway/configs
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: cluster-settings
+      - kind: Secret
+        name: cluster-secrets
+  dependsOn:
+    - name: cilium-config
+      namespace: kube-system
+  prune: true
+  retryInterval: 2m
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+    namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
