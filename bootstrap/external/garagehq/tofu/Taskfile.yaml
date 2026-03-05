@@ -1,0 +1,76 @@
+---
+version: "3"
+
+set: [pipefail]
+shopt: [globstar]
+
+vars:
+  PARALLEL_APPLY: 1
+  PARALLEL_DESTROY: 4
+  # TRACE, DEBUG, INFO, WARN or ERROR
+  TF_LOG: WARN
+
+tasks:
+  default: task --list
+
+  apply:
+    desc: Create GarageHQ infrastructure
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - TF_LOG={{.TF_LOG}} tofu apply -auto-approve -parallelism={{.PARALLEL_APPLY}}
+      - |
+        {{ if .SUPPRESS_ALERT | contains "false" }}
+          {{ if .EXIT_CODE }}
+            ntfy_alert.sh --topic "k8s" --title "garagehq:recreate failed" --message "Task garagehq:recreate failed" -at "fail"
+          {{else}}
+            ntfy_alert.sh --topic "k8s" --title "garagehq:recreate completed" --message "Task garagehq:recreate completed successfully" -at "pass"
+          {{end}}
+        {{end}}
+
+  destroy:
+    desc: Destroy Talos infrastructure
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - TF_LOG={{.TF_LOG}} tofu destroy -auto-approve -parallelism={{.PARALLEL_DESTROY}}
+      - |
+        {{ if .SUPPRESS_ALERT | contains "false" }}
+          {{ if .EXIT_CODE }}
+            ntfy_alert.sh --topic "k8s" --title "garagehq:destroy failed" --message "Task garagehq:recreate failed" -at "fail"
+          {{else}}
+            ntfy_alert.sh --topic "k8s" --title "garagehq:destroy completed" --message "Task garagehq:recreate completed successfully" -at "pass"
+          {{end}}
+        {{end}}
+
+  recreate:
+    desc: Destroy and recreate Talos infrastructure
+    vars:
+      SUPPRESS_ALERT: "{{ default false .SUPPRESS_ALERT }}"
+    cmds:
+      - task: destroy
+        vars:
+          SUPPRESS_ALERT: true
+      - sleep 5
+      - task: apply
+        vars:
+          SUPPRESS_ALERT: true
+      - |
+        {{ if .SUPPRESS_ALERT | contains "false" }}
+          {{ if .EXIT_CODE }}
+            ntfy_alert.sh --topic "k8s" --title "garagehq:recreate failed" --message "Task garagehq:recreate failed" -at "fail"
+          {{else}}
+            ntfy_alert.sh --topic "k8s" --title "garagehq:recreate completed" --message "Task garagehq:recreate completed successfully" -at "pass"
+          {{end}}
+        {{end}}
+
+  init:
+    desc: Initialize the opentofu directory
+    cmds:
+      - tofu init
+
+  format:
+    desc: Format the opentofu directory
+    cmds:
+      - tofu validate
+      - tofu fmt
