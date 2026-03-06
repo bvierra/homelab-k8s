@@ -68,3 +68,18 @@ tasks:
             ntfy_alert.sh --topic "k8s" --title "proxmox:recreate completed" --message "Task proxmox:recreate completed successfully" -at "pass"
           {{end}}
         {{end}}
+
+  init:
+    desc: Initialize Talos backend
+    cmds:
+      - "tofu init"
+
+  init-upgrade:
+    desc: Initialize Talos backend with upgrade flag (for upgrading to new versions of Tofu)
+    cmds:
+      - "tofu init -upgrade"
+
+  init-reconfigure:
+    desc: Initialize Talos backend with reconfigure flag (for changing backend config)
+    cmds:
+      - "tofu init -reconfigure"
