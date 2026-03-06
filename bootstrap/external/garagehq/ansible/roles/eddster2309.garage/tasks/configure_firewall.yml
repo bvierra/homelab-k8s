@@ -1,0 +1,45 @@
+- name: Allow Garage ports for other nodes
+  ansible.posix.firewalld:
+    rich_rule: "rule family='ipv4' source address='{{ hostvars[item[0]]['ansible_default_ipv4']['address'] }}/32'
+                port protocol='tcp' port='{{ item[1] }}' accept"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop: "{{ lookup('cartesian', ansible_play_hosts, ports) }}"
+  vars:
+    ports:
+      - "{{ garage_s3_port }}"
+      - "{{ garage_web_port }}"
+  when: ansible_play_hosts | length > 1 and garage_nginx_enabled | bool
+
+- name: Allow Garage ports directly
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - "{{ garage_s3_port }}/tcp"
+    - "{{ garage_web_port }}/tcp"
+  when: not garage_nginx_enabled | bool
+
+- name: Allow Garage RPC port to other nodes
+  ansible.posix.firewalld:
+    rich_rule: "rule family='ipv4' source address='{{ hostvars[item]['ansible_default_ipv4']['address'] }}/32' port protocol='tcp'
+                port='{{ garage_rpc_port }}' accept"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop: "{{ ansible_play_hosts }}"
+  when: ansible_play_hosts | length > 1
+
+- name: Allow Web ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - 80/tcp
+    - 443/tcp
+  when: garage_nginx_enabled | bool

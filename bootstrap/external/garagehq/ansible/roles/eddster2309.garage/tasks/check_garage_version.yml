@@ -1,0 +1,48 @@
+- name: Check if garage is already installed
+  ansible.builtin.stat:
+    name: "{{ garage_binary }}"
+  register: garage_binary_stat
+
+- name: Get current Garage version
+  ansible.builtin.command:
+    cmd: "{{ garage_binary }} node --version"
+  changed_when: false
+  register: garage_version_output
+  when: garage_binary_stat.stat.exists
+
+- name: Set current Garage version fact
+  ansible.builtin.set_fact:
+    current_garage_version: "{{ garage_version_output.stdout.split(' ')[-1] }}"
+  when: garage_binary_stat.stat.exists and garage_version_output.rc == 0
+
+- name: Check if Garage version is valid
+  when: garage_version is defined and garage_version != "latest"
+  block:
+    - name: Get set Garage version details
+      ansible.builtin.uri:
+        url: "https://git.deuxfleurs.fr/api/v1/repos/Deuxfleurs/garage/releases/tags/{{ garage_version }}"
+        return_content: true
+      register: garage_version_details
+
+    - name: Check if Garage version exists
+      ansible.builtin.fail:
+        msg: "Garage version {{ garage_version }} does not exist. Please check the version."
+      when: garage_version_details.status == 404
+
+- name: Get Latest Garage version
+  when: garage_version is not defined or garage_version == "latest"
+  block:
+    - name: Get latest Garage version
+      ansible.builtin.uri:
+        url: https://git.deuxfleurs.fr/api/v1/repos/Deuxfleurs/garage/releases?draft=false&pre-release=false&limit=1
+        return_content: true
+      register: garage_latest
+
+    - name: Get Garage version
+      ansible.builtin.set_fact:
+        garage_version: "{{ garage_latest.json[0].tag_name }}"
+
+- name: Check if Garage version is older
+  ansible.builtin.fail:
+    msg: "Garage version {{ garage_version }} is older than the current version {{ current_garage_version }}."
+  when: current_garage_version is defined and current_garage_version is version(garage_version, '>')

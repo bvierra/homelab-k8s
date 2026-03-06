@@ -1,0 +1,7 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+{{ (fromYaml (readFile (printf "../../../manifests/apps/%s/%s/app/helm/values.yaml" .Release.Namespace .Release.Name))) | .instance | toYaml | indent 2 }}

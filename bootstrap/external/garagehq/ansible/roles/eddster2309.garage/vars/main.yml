@@ -1,0 +1,16 @@
+garage_binary: /usr/local/bin/garage
+garage_user: garage
+garage_group: garage
+garage_log_level: "netapp=info,garage=info"
+
+keepalived_show_ansible_managed: true
+keepalived_instances:
+  internal:
+    interface: "{{ ansible_default_ipv4.interface }}"
+    state: "{{ (ansible_play_hosts.index(inventory_hostname) == 0) | ternary('MASTER', 'BACKUP') }}"
+    virtual_router_id: "{{ vrrp_id | default(42) }}"
+    priority: "{{ (inventory_hostname == ansible_play_hosts[0]) | ternary('200', '100') }}"
+    vips:
+      - "{{ garage_vip }} dev {{ ansible_default_ipv4.interface }}"
+
+garage_nginx_client_max_body_size: 100m

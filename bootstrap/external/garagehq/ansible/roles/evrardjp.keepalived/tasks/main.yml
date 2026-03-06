@@ -1,0 +1,372 @@
+---
+# Copyright 2015, Jean-Philippe Evrard <jean-philippe@evrard.me>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Debug role vars (instances)
+  ansible.builtin.debug:
+    var: keepalived_instances
+    verbosity: 2
+
+- name: Debug role vars (sync_groups)
+  ansible.builtin.debug:
+    var: keepalived_sync_groups
+    verbosity: 2
+
+- name: Debug role vars (virtual_servers)
+  ansible.builtin.debug:
+    var: keepalived_virtual_servers
+    verbosity: 2
+
+- name: Debug role vars (scripts)
+  ansible.builtin.debug:
+    var: keepalived_scripts
+    verbosity: 2
+
+- name: Gather variables for each operating system
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_version'].split('.')[0] }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+  tags:
+    - always
+
+- name: Configure SELinux
+  ansible.builtin.include_tasks:
+    file: keepalived_selinux.yml
+  when:
+    - keepalived_selinux_compile_rules | length > 0
+    - ansible_facts['selinux']['status'] is defined
+    - ansible_facts['selinux']['status'] == "enabled"
+  tags:
+    - keepalived-install
+    - keepalived-config
+
+- name: Install keepalived package(s)
+  ansible.builtin.package:
+    name: "{{ [keepalived_package_name] + keepalived_scripts_packages }}"
+    state: "{{ keepalived_package_state }}"
+    update_cache: true
+    cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(cache_timeout, omit) }}"
+  notify:
+    - Restart keepalived
+  tags:
+    - keepalived-packages
+    - keepalived-install
+
+# Can't use package facts, as it won't be parsed
+# properly by version test on debian/ubuntu.
+# keepalived --version outputs on stderr
+# First line of stderr is similar to 'keepalived v1.0.4 (date)'
+- name: Output keepalived version
+  ansible.builtin.command: keepalived --version
+  register: _keepalived_version
+  changed_when: false
+  check_mode: false
+  tags:
+    - keepalived-config
+
+- name: Set testability flag
+  ansible.builtin.set_fact:
+    keepalived_config_testable: "{{ _keepalived_version.stderr_lines[0] | regex_search('[kK]eepalived v(.*) ', '\\1') | join('.') is version('2.0.4', 'ge') }}"
+  tags:
+    - keepalived-config
+
+- name: Ensure no new "samples" folder appeared
+  ansible.builtin.file:
+    path: /etc/keepalived/samples/
+    state: absent
+  when:
+    - ansible_facts['os_family'] | lower == 'debian'
+  tags:
+    - keepalived-install
+
+- name: Get IPv6 enabled state
+  ansible.builtin.slurp:
+    src: /sys/module/ipv6/parameters/disable
+  register: _ipv6_disabled
+  tags:
+    - keepalived-install
+
+- name: Check if IPv6 is enabled
+  ansible.builtin.set_fact:
+    ipv6_enabled: "{{ not _ipv6_disabled.failed and '0' in (_ipv6_disabled.content | b64decode) }}"
+  tags:
+    - keepalived-install
+
+- name: Allow consuming apps to bind on non local addresses for IPv4
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    state: present
+  when: keepalived_bind_on_non_local | bool
+  loop:
+    - name: "net.ipv4.ip_nonlocal_bind"
+      value: 1
+    - name: "net.ipv4.tcp_retries2"
+      value: "{{ keepalived_sysctl_tcp_retries }}"
+  notify:
+    - Restart keepalived
+  tags:
+    - keepalived-install
+
+- name: Allow consuming apps to bind on non local addresses for IPv6
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    state: present
+  when: keepalived_bind_on_non_local | bool
+        and ipv6_enabled
+  loop:
+    - name: "net.ipv6.ip_nonlocal_bind"
+      value: 1
+  notify:
+    - Restart keepalived
+  tags:
+    - keepalived-install
+
+- name: Check that daemon options file exists
+  ansible.builtin.stat:
+    path: "{{ keepalived_daemon_options_file_path }}"
+  register: keepalived_daemon_options_file
+  tags:
+    - keepalived-config
+
+- name: Configure keepalived extra params
+  ansible.builtin.lineinfile:
+    line: "{{ item }}"
+    regexp: "^{{ item.split('=')[0] }}"
+    dest: "{{ keepalived_daemon_options_file_path }}"
+    state: present
+  loop: "{{ keepalived_daemon_default_options_overrides }}"
+  when: keepalived_daemon_options_file.stat.exists
+  notify:
+    - Restart keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the tracking scripts
+  ansible.builtin.copy:
+    src: "{{ item.value.src_check_script }}"
+    dest: "{{ item.value.dest_check_script | default(item.value.check_script) }}"
+    mode: "0755"
+  loop: "{{ keepalived_scripts | dict2items }}"
+  when: "'src_check_script' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the general notification scripts
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_script }}"
+    dest: "{{ item.value.notify_script }}"
+    mode: "0755"
+  loop: "{{ keepalived_sync_groups | dict2items }}"
+  when: "'src_notify_script' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the notification scripts for switching to master
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_master }}"
+    dest: "{{ item.value.notify_master }}"
+    mode: "0755"
+  loop: "{{ keepalived_sync_groups | dict2items }}"
+  when: "'src_notify_master' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the notification scripts for switching to backup
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_backup }}"
+    dest: "{{ item.value.notify_backup }}"
+    mode: "0755"
+  loop: "{{ keepalived_sync_groups | dict2items }}"
+  when: "'src_notify_backup' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the notification scripts for failures
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_fault }}"
+    dest: "{{ item.value.notify_fault }}"
+    mode: "0755"
+  loop: "{{ keepalived_sync_groups | dict2items }}"
+  when: "'src_notify_fault' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the general notification scripts (instances)
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_script }}"
+    dest: "{{ item.value.notify_script }}"
+    mode: "0755"
+  loop: "{{ keepalived_instances | dict2items }}"
+  when: "'src_notify_script' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the notification scripts for switching to master (instances)
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_master }}"
+    dest: "{{ item.value.notify_master }}"
+    mode: "0755"
+  loop: "{{ keepalived_instances | dict2items }}"
+  when: "'src_notify_master' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the notification scripts for lower priority master case (instances)
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_master_rx_lower_pri }}"
+    dest: "{{ item.value.notify_master_rx_lower_pri }}"
+    mode: "0755"
+  loop: "{{ keepalived_instances | dict2items }}"
+  when: "'src_notify_master_rx_lower_pri' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the notification scripts for switching to backup (instances)
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_backup }}"
+    dest: "{{ item.value.notify_backup }}"
+    mode: "0755"
+  loop: "{{ keepalived_instances | dict2items }}"
+  when: "'src_notify_backup' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the notification scripts for stopping vrrp (instances)
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_stop }}"
+    dest: "{{ item.value.notify_stop }}"
+    mode: "0755"
+  loop: "{{ keepalived_instances | dict2items }}"
+  when: "'src_notify_stop' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Dropping the notification scripts for failures (instances)
+  ansible.builtin.copy:
+    src: "{{ item.value.src_notify_fault }}"
+    dest: "{{ item.value.notify_fault }}"
+    mode: "0755"
+  loop: "{{ keepalived_instances | dict2items }}"
+  when: "'src_notify_fault' in item.value"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Configure keepalived
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: "{{ keepalived_config_file_path }}"
+    mode: "0640"
+    validate: "{{ keepalived_config_testable | ternary('keepalived --config-test -f %s', omit) }}"
+  notify:
+    - Reload keepalived
+  tags:
+    - keepalived-config
+
+- name: Make directory for keepalived's systemd overrides
+  ansible.builtin.file:
+    path: /etc/systemd/system/keepalived.service.d/
+    state: directory
+    mode: "0755"
+  when:
+    - keepalived_systemd_overrides | bool
+  tags:
+    - keepalived-install
+
+- name: Apply keepalived override to start after network is up
+  community.general.ini_file:
+    path: /etc/systemd/system/keepalived.service.d/override.conf
+    create: true
+    section: 'Unit'
+    option: "{{ item }}"
+    value: 'network-online.target'
+    mode: '0644'
+  loop:
+    - 'Wants'
+    - 'After'
+  when:
+    - keepalived_systemd_overrides | bool
+  notify:
+    - Restart keepalived
+  tags:
+    - keepalived-install
+
+- name: Apply keepalived override to restart service always
+  community.general.ini_file:
+    path: /etc/systemd/system/keepalived.service.d/override.conf
+    section: 'Service'
+    option: "Restart"
+    value: 'always'
+    mode: '0644'
+  when:
+    - keepalived_systemd_overrides | bool
+    - keepalived_systemd_override_service_restart | bool
+  notify:
+    - Restart keepalived
+  tags:
+    - keepalived-install
+
+- name: Remove keepalived overrides
+  ansible.builtin.file:
+    path: /etc/systemd/system/keepalived.service.d/override.conf
+    state: absent
+  when:
+    - not (keepalived_systemd_overrides | bool)
+  tags:
+    - keepalived-install
+
+- name: Ensuring keepalived is enabled and started
+  ansible.builtin.service:
+    daemon_reload: true
+    name: "{{ keepalived_service_name }}"
+    state: "started"
+    enabled: "yes"
+    masked: "no"
+  register: _servicestart
+  tags:
+    - keepalived-install

@@ -1,0 +1,7 @@
+- name: Install GarageHQ WebUI
+  hosts: garagehq
+  gather_facts: false
+  become: true
+  tasks:
+    - ansible.builtin.include_tasks:
+        file: ../tasks/install-webui.yml

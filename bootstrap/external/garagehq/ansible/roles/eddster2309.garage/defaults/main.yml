@@ -1,0 +1,115 @@
+# Where Garage stores its metadata and data.
+# The idea of separate directories is to allow for metdata to be on faster storage than data.
+garage_metadata_directory: /opt/garage/metadata
+garage_data_directory: /opt/garage/data
+garage_metadata_snapshot_directory: "{{ garage_metadata_directory }}/snapshots"
+
+# System architecture to determine what binary to install
+garage_architecture: "{{ ansible_architecture }}"
+
+# This can be set to a specific version or "latest"
+# The version tag should be in the format vX.Y.Z
+garage_version: "latest"
+
+# It is not recommended to change this value after installation.
+# Please refer to the documentation for more information: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#replication_factor
+garage_replication_factor: "{{ ansible_play_hosts | length }}"
+
+# Must be set to "cconsistent", "degraded" or "dangerous".
+# Refer to the documentation for more information: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#consistency_mode
+garage_consistency_mode: "consistent"
+
+# This must be set to "sqlite", "lmdb" or "sled" (pre v0.9.0).
+# Refer to the documentation for more information: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#db_engine
+garage_db_engine: sqlite
+
+garage_metadata_fsync: false
+garage_data_fsync: false
+
+# Enabling this may not be reccomend if you have high write loads. It is reccomended to use file system snapshots instead.
+# Please refer to the documentation for more information:
+# https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#metadata_auto_snapshot_interval
+garage_metadata_autosnapshot_enabled: false
+garage_metadata_autosnapshot_interval: 6h
+
+garage_scrub_enabled: true
+
+# By default Garage uses UTC to run the lifecycle worker.
+# Refer to the documentation for more information: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#use_local_tz
+garage_use_local_time: true
+
+# The size of the blocks used by Garage for storing data. You may want to increase this if you have large files and a good network connection between nodes.
+# Please refer to the documentation for more information: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#block_size
+garage_block_size: "1M"
+
+# Before changing this value, please read the documentation: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#block_ram_buffer_max
+garage_block_ram_buffer_max: "256MiB"
+
+# The Zstd compression level used by Garage for storing data. This can be set to an integer between 1 and 19, or "none" to disable compression.
+# Please refer to the documentation for more information: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#compression_level
+garage_compression_level: 2
+
+# S3 Web Access
+# Garage supports S3 web access, which allows you to use Garage to host static websites or serve files over HTTP.
+# Refer to the documentation for more information: https://garagehq.deuxfleurs.fr/documentation/cookbook/exposing-websites/
+garage_web_access_enabled: true
+garage_web_root_domain: "web.garage.internal"
+garage_web_port: 3902
+garage_web_default_index: "index.html"
+
+# S3 Access
+# The root domain for the S3 service. This is used for the S3 API, both path and host style access. This is not meant to be a wildcard domain.
+garage_s3_root_domain: "s3.garage.internal"
+# The region for the S3 service. This is used for the S3 API. Garage will reject any requests that do not match this region.
+garage_s3_region: "garage"
+
+# The name of the zone for the Garage service
+# If you set this within host vars it allows for fancy configurations for redundancy incase you have multiple zones (locations)
+garage_zone_name: garage
+
+# I would reccomend setting this in host vars to allow for different node sizes.
+# But also it is best that this is the same across all nodes.
+# Please read the documentation for more information on this: https://garagehq.deuxfleurs.fr/documentation/cookbook/real-world/
+garage_node_capacity: 15G
+
+# Secrets. PLEASE CHANGE THESE!
+garage_rpc_secret: SECRET
+garage_admin_token: SECRET
+garage_metrics_token: SECRET
+
+# Ports
+# The RPC and Admin ports are not exposed outside the cluster.
+garage_admin_api_port: 3903
+garage_rpc_port: 3901
+garage_s3_port: 3900
+
+# This must be an address that all nodes in the cluster can use to reach other nodes.
+garage_rpc_address: "{{ ansible_default_ipv4.address }}"
+
+# Nginx only supported for single node deployments
+# If you want a multi-node deployment, you need to bring your own reverse proxy.
+garage_nginx_enabled: true
+garage_nginx_ssl_enabled: false
+garage_nginx_http_redirect_https: true
+# garage_nginx_ssl_cert: /etc/ssl/certs/garage.crt
+# garage_nginx_ssl_key: /etc/ssl/private/garage.key
+
+garage_keepalived_enabled: true
+# The VIP for the Garage service, used by keepalived
+# garage_vip: 0.0.0.0
+
+garage_buckets:
+  - name: garage
+    web_access:
+      enabled: false
+
+garage_keys:
+  - name: "garage"
+    id: GK1234567890abcdef12345678
+    secret: 1234567890abcdef123456781234567890abcdef123456781234567890abcdef
+    buckets:
+      - name: "garage"
+        access:
+          - read
+          - write
+          - owner

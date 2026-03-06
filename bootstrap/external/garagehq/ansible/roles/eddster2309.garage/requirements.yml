@@ -1,0 +1,2 @@
+- src: evrardjp.keepalived
+  version: "8.2.0"

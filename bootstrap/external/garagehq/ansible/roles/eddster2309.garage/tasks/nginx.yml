@@ -1,0 +1,27 @@
+- name: Install nginx
+  ansible.builtin.package:
+    name: nginx
+    state: present
+
+- name: Create nginx configuration file
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/garage.conf
+    mode: '0644'
+    owner: root
+    group: root
+  notify: Restart nginx
+
+- name: Start and enable nginx service
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Allow nginx selinux
+  ansible.posix.seboolean:
+    name: httpd_can_network_connect
+    state: true
+    persistent: true
+  when: ansible_selinux is defined and ansible_selinux.status == 'enabled'

@@ -1,0 +1,107 @@
+##############################################################
+# This task file is responsible for installing the garage-webui binary, creating a systemd service for it, and starting the service.
+# It also checks the currently installed version of garage-webui (if it exists) and only installs/starts the new version if it is newer than the currently installed version.
+# The garage-webui version is stored in the /etc/garage-webui-version file, and the binary is installed at /usr/local/bin/garage-webui.
+# The systemd service is created at /etc/systemd/system/garage-webui.service and is enabled to start on boot.
+# After starting the service, it waits for the web UI to be available before proceeding.
+##############################################################
+
+######
+# Here we check to see if the garage-webui binary is already installed, and if so,
+# we check the currently installed version by reading it from the /etc/garage-webui-version file.
+# we then compare the currently installed version with the version we want to install (garage_webui_version)
+######
+- name: Set garage-webui_needs_upgrade fact to false
+  when: garage_webui_enabled
+  ansible.builtin.set_fact:
+    garage_webui_needs_upgrade: false
+
+- name: Set garage-webui_installed_version fact to 0.0.0
+  when: garage_webui_enabled
+  ansible.builtin.set_fact:
+    garage_webui_version_current: "0.0.0"
+
+- name: Check if garage-webui is already installed
+  when: garage_webui_enabled
+  ansible.builtin.stat:
+    name: /usr/local/bin/garage-webui
+  register: garage_webui_stat
+
+- name: Check if /etc/garage-webui-version file exists
+  when: garage_webui_enabled
+  ansible.builtin.stat:
+    name: /etc/garage-webui-version
+  register: garage_webui_version_stat
+
+- name: Get installed garage-webui version from /etc/garage-webui-version
+  when: garage_webui_enabled and garage_webui_stat.stat.exists and garage_webui_version_stat.stat.exists
+  ansible.builtin.slurp:
+    src: /etc/garage-webui-version
+  register: _garage_webui_version
+
+- name: Store current garage-webui version in fact garage-webui_version_current
+  when: garage_webui_enabled and garage_webui_stat.stat.exists and garage_webui_version_stat.stat.exists
+  ansible.builtin.set_fact:
+    garage_webui_version_current: "{{ _garage_webui_version.content | b64decode | trim }}"
+
+- name: Check if garage-webui needs to be upgraded
+  when: garage_webui_enabled and garage_webui_version_current is version(garage_webui_version, '<')
+  ansible.builtin.set_fact:
+    garage_webui_needs_upgrade: true
+
+- name: Check if garage-webui version is valid
+  when: garage_webui_enabled and garage_webui_needs_upgrade and garage_webui_version is defined
+  block:
+    - name: Get garage-ui version details
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/khairul169/garage-webui/releases/tags/{{ garage_webui_version }}"
+        return_content: true
+      register: garage_webui_version_details
+
+    - name: Check if garage-webui version exists
+      ansible.builtin.fail:
+        msg: "Garage-webui version {{ garage_webui_version }} does not exist. Please check the version."
+      when: garage_webui_version_details.status == 404
+
+- name: Download garage-webui to /usr/local/bin/garage-webui
+  when: garage_webui_enabled and garage_webui_needs_upgrade
+  ansible.builtin.get_url:
+    url: "https://github.com/khairul169/garage-webui/releases/download/{{ garage_webui_version }}/garage-webui-v{{ garage_webui_version }}-linux-amd64"
+    dest: /usr/local/bin/garage-webui
+    mode: "0755"
+
+- name: Create systemd service for garage-webui
+  when: garage_webui_enabled and garage_webui_needs_upgrade
+  ansible.builtin.template:
+    src: ../templates/garage-webui.service.j2
+    dest: /etc/systemd/system/garage-webui.service
+    mode: "0644"
+    owner: root
+    group: root
+
+- name: Start garage-webui service
+  when: garage_webui_enabled and garage_webui_needs_upgrade
+  ansible.builtin.systemd_service:
+    name: garage-webui
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Wait for garage-webui to be available
+  when: garage_webui_enabled and garage_webui_needs_upgrade
+  ansible.builtin.uri:
+    url: "http://localhost:{{ garage_webui_port }}"
+    timeout: 5
+  register: webui_check_result
+  until: webui_check_result.status == 200
+  retries: 10
+  delay: 5
+
+- name: Store garage_webui_version to /etc/garage-webui-version
+  when: garage_webui_enabled and garage_webui_needs_upgrade
+  ansible.builtin.copy:
+    content: "{{ garage_webui_version }}"
+    dest: /etc/garage-webui-version
+    mode: "0644"
+    owner: root
+    group: root

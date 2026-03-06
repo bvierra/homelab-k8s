@@ -1,0 +1,6 @@
+collections:
+  - name: infisical.vault
+
+roles:
+  - name: eddster2309.garage
+  - name: evrardjp.keepalived

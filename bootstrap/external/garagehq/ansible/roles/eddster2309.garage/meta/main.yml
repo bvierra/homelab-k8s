@@ -1,0 +1,20 @@
+galaxy_info:
+  role_name: garage
+  author: eddster2309
+  description: Setup Garage, a S3-compatible object storage server.
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Fedora
+      versions:
+        - all
+  galaxy_tags:
+    - garage
+    - s3
+    - storage

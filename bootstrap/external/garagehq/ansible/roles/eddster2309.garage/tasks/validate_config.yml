@@ -1,0 +1,53 @@
+- name: Don't allow 2 node deployment
+  ansible.builtin.assert:
+    that: not ansible_play_hosts | length == 2
+    msg: "A clustered Garage deployment requires at least 3 nodes."
+
+- name: Check that replication factor is not larger than number of nodes
+  ansible.builtin.assert:
+    that:
+      - garage_replication_factor | int <= ansible_play_hosts | length
+    msg: "The replication factor must not be larger than the number of nodes in the cluster."
+
+- name: Check that replication factor is not less than 1
+  ansible.builtin.assert:
+    that:
+      - garage_replication_factor | int >= 1
+    msg: "The replication factor must be at least 1."
+
+- name: Check that consistency mode is valid
+  ansible.builtin.assert:
+    that:
+      - garage_consistency_mode in ['consistent', 'degraded', 'dangerous']
+    msg: "The consistency mode must be one of 'consistent', 'degraded', or 'dangerous'."
+
+- name: Check that db engine is valid
+  ansible.builtin.assert:
+    that:
+      - garage_db_engine in ['sqlite', 'lmdb', 'sled']
+      - garage_db_engine != 'sled' or garage_version is version('0.9.0', '<')
+    msg: "The database engine must be one of 'sqlite', 'lmdb', or 'sled' (pre v0.9.0)."
+
+- name: Check that compression level is valid
+  ansible.builtin.assert:
+    that:
+      - (garage_compression_level | int >= 1 and garage_compression_level | int <= 19) or garage_compression_level == "none"
+    msg: "The compression level must be an integer between 1 and 19. 'none' is also a valid value."
+
+- name: Check if secrets have been changed from default
+  ansible.builtin.assert:
+    that:
+      - item != 'SECRET' and item is not none
+    msg: "The secret {{ item }} must be set to a non-default value."
+  loop:
+    - garage_rpc_secret
+    - garage_admin_token
+    - garage_metrics_token
+
+- name: Remove dot from start of root domains
+  ansible.builtin.set_fact:
+    garage_s3_root_domain: "{{ garage_s3_root_domain.lstrip('.') }}"
+    garage_web_root_domain: "{{ garage_web_root_domain.lstrip('.') }}"
+  when:
+    - garage_s3_root_domain is defined
+    - garage_web_root_domain is defined

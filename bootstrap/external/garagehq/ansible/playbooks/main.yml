@@ -1,0 +1,40 @@
+- name: Login to external secrets server
+  hosts: controllers
+  gather_facts: false
+  tasks:
+    - name: Login to external secrets server
+      ansible.builtin.include_tasks:
+        file: ../tasks/external_secrets.yml
+
+- name: Check External Secret Variables are correct
+  hosts: controllers
+  gather_facts: false
+  tasks:
+    - name: Assert External Secret Variables are correct
+      ansible.builtin.include_tasks:
+        file: ../tasks/check_variables.yml
+
+- name: Install and setup GarageHQ
+  hosts: garagehq
+  gather_facts: true
+  become: true
+  tasks:
+    - name: GarageHQ Installation
+      ansible.builtin.include_role:
+        name: eddster2309.garage
+  vars:
+    garage_key_id: "{{ hostvars.controller.secrets.KEY_ID }}"
+    garage_key_secret: "{{ hostvars.controller.secrets.KEY_SECRET }}"
+    garage_rpc_secret: "{{ hostvars.controller.secrets.RPC_SECRET }}"
+    garage_admin_token: "{{ hostvars.controller.secrets.ADMIN_TOKEN }}"
+    garage_metrics_token: "{{ hostvars.controller.secrets.METRICS_TOKEN }}"
+  vars_files:
+    - ../inventory/group_vars/all.yml
+
+- name: Install GarageHQ WebUI
+  hosts: garagehq
+  gather_facts: false
+  become: true
+  tasks:
+    - ansible.builtin.include_tasks:
+        file: ../tasks/install-webui.yml

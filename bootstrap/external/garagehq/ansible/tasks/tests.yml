@@ -1,0 +1,16 @@
+- name: DEBUG | External Secrets | KEY_ID
+  ansible.builtin.debug:
+    msg: "TEST_SECRET: {{ secrets.secrets.KEY_ID }}"
+
+- name: DEBUG | External Secrets | All Vars
+  ansible.builtin.debug:
+    var: secrets.secrets
+#vars:
+#  read_all_secrets_within_scope: "{{ lookup('infisical.vault.read_secrets', login_data: {{ infisical_login.login_data }}, project_id='{{ infisical_project_id }}', path='{{ infisical_path }}', env_slug='{{ infisical_env_slug }}' }}"
+#  # [{ "key": "HOST", "value": "google.com" }, { "key": "SMTP", "value": "gmail.smtp.edu" }]
+#
+#  read_all_secrets_as_dict: "{{ lookup('infisical.vault.read_secrets', as_dict=True, login_data: {{ infisical_login.login_data }}, project_id='{{ infisical_project_id }}', path='{{ infisical_path }}', env_slug='{{ infisical_env_slug }}' }}"
+#  # { "SECRET_KEY_1": "secret-value-1", "SECRET_KEY_2": "secret-value-2" } -> Can be accessed as secrets.SECRET_KEY_1
+#
+#  read_secret_by_name_within_scope: "{{ lookup('infisical.vault.read_secrets', login_data: {{ infisical_login.login_data }}, project_id='{{ infisical_project_id }}', path='{{ infisical_path }}', env_slug='{{ infisical_env_slug }}' }}"
+#  # { "key": "HOST", "value": "google.com" }

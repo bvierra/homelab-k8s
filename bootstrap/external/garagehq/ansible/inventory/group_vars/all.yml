@@ -1,0 +1,91 @@
+infisical_client_id: "{{ lookup('ansible.builtin.env', 'INFISICAL_CLIENT_ID') }}"
+infisical_client_secret: "{{ lookup('ansible.builtin.env', 'INFISICAL_CLIENT_SECRET') }}"
+infisical_url: "https://secrets.lab.vierra.host"
+infisical_project_id: "20c5f872-b2b4-4581-a9c3-e03d00cface0"
+infisical_env_slug: "dev"
+infisical_path: "/APPS/GARAGEHQ"
+
+garage_metadata_directory: /opt/garage/metadata
+garage_data_directory: /opt/garage/data
+garage_metadata_snapshot_directory: "{{ garage_metadata_directory }}/snapshots"
+garage_version: "v2.2.0"
+garage_replication_factor: 1
+garage_consistency_mode: "consistent"
+garage_db_engine: sqlite
+garage_metadata_fsync: false
+garage_data_fsync: false
+
+# Enabling this may not be reccomend if you have high write loads. It is reccomended to use file system snapshots instead.
+# Please refer to the documentation for more information:
+# https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/#metadata_auto_snapshot_interval
+garage_metadata_autosnapshot_enabled: false
+garage_metadata_autosnapshot_interval: 6h
+
+garage_scrub_enabled: true
+garage_use_local_time: true
+garage_block_size: "1M"
+garage_compression_level: 2
+
+# S3 Web Access
+# Garage supports S3 web access, which allows you to use Garage to host static websites or serve files over HTTP.
+# Refer to the documentation for more information: https://garagehq.deuxfleurs.fr/documentation/cookbook/exposing-websites/
+garage_web_access_enabled: true
+garage_web_root_domain: "web.garage.lab.vierra.host"
+garage_web_port: 3902
+garage_web_default_index: "index.html"
+
+# S3 Access
+# The root domain for the S3 service. This is used for the S3 API, both path and host style access. This is not meant to be a wildcard domain.
+garage_s3_root_domain: "s3.garage.lab.vierra.host"
+# The region for the S3 service. This is used for the S3 API. Garage will reject any requests that do not match this region.
+garage_s3_region: "garage"
+
+garage_zone_name: homelab
+
+garage_node_capacity: 15G
+
+# Secrets. PLEASE CHANGE THESE!
+#garage_rpc_secret: SECRET
+#garage_admin_token: SECRET
+#garage_metrics_token: SECRET
+
+# Ports
+# The RPC and Admin ports are not exposed outside the cluster.
+garage_admin_api_port: 3903
+garage_rpc_port: 3901
+garage_s3_port: 3900
+
+# This must be an address that all nodes in the cluster can use to reach other nodes.
+garage_rpc_address: "{{ ansible_default_ipv4.address }}"
+
+# Nginx only supported for single node deployments
+# If you want a multi-node deployment, you need to bring your own reverse proxy.
+garage_nginx_enabled: false
+# garage_nginx_ssl_enabled: false
+# garage_nginx_http_redirect_https: true
+# garage_nginx_ssl_cert: /etc/ssl/certs/garage.crt
+# garage_nginx_ssl_key: /etc/ssl/private/garage.key
+
+garage_keepalived_enabled: false
+# The VIP for the Garage service, used by keepalived
+# garage_vip: 0.0.0.0
+
+garage_buckets:
+  - name: tofu
+    web_access:
+      enabled: false
+
+garage_keys:
+  - name: "tofu"
+    id: "{{ garage_key_id }}"
+    secret: "{{ garage_key_secret }}"
+    buckets:
+      - name: "tofu"
+        access:
+          - read
+          - write
+          - owner
+
+garage_webui_enabled: true
+garage_webui_port: 3919
+garage_webui_version: "1.1.0"

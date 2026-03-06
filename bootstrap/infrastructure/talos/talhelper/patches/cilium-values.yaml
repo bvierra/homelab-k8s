@@ -1,0 +1,130 @@
+cluster:
+  inlineManifests:
+    - name: cilium-values
+      contents: |
+        ---
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: cilium-values
+          namespace: kube-system
+        data:
+          values.yaml: |-
+            bgpControlPlane:
+              enabled: true
+            devices: eth0
+            
+            cgroup:
+              autoMount:
+                enabled: false
+              hostRoot: /sys/fs/cgroup
+            endpointRoutes:
+              enabled: true
+            envoy:
+              enabled: true
+              securityContext:
+                capabilities:
+                  keepCapNetBindService: true
+                  envoy:
+                    - NET_ADMIN
+                    - PERFMON
+                    - BPF
+                    - NET_BIND_SERVICE
+              prometheus:
+                serviceMonitor:
+                  enabled: true
+            
+            externalIPs:
+              enabled: true
+            gatewayAPI:
+              enabled: true
+              enableAlpn: true
+              enableAppProtocol: true
+            hubble:
+              relay:
+                enabled: true
+              metrics:
+                enabled: true
+              ui:
+                enabled: true
+                httpRoute:
+                  enabled: true
+                  # Optional: specify your hostname
+                  hostnames:
+                    - "hubble.k8s.${DOMAIN_0}"
+                  # Optional: specify your parent gateway
+                  parentRefs:
+                    - name: "external"
+                      namespace: "gateway-system"
+            
+            ingressController:
+              enabled: true
+              default: true
+              loadbalancerMode: shared
+              service:
+                annotations:
+                  io.cilium/lb-ipam-ips: 10.11.100.1
+            # https://docs.cilium.io/en/stable/network/concepts/ipam/
+            ipam:
+              mode: kubernetes
+            # ipv4NativeRoutingCIDR: 10.0.0.0/8
+            # Talos specific
+            # https://www.talos.dev/latest/kubernetes-guides/configuration/kubeprism/
+            k8sServiceHost: localhost
+            k8sServicePort: 7445
+            kubeProxyReplacement: true
+            loadBalancer:
+              algorithm: maglev
+              mode: dsr
+            operator:
+              rollOutPods: true
+              prometheus:
+                serviceMonitor:
+                  enabled: true
+            rollOutCiliumPods: true
+            securityContext:
+              capabilities:
+                ciliumAgent:
+                  [
+                    NET_BIND_SERVICE,
+                    CHOWN,
+                    KILL,
+                    NET_ADMIN,
+                    NET_RAW,
+                    IPC_LOCK,
+                    SYS_ADMIN,
+                    SYS_RESOURCE,
+                    DAC_OVERRIDE,
+                    FOWNER,
+                    SETGID,
+                    SETUID,
+                  ]
+                cleanCiliumState: [NET_BIND_SERVICE, NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
+            
+            ######
+            # Monitoring
+            ######
+            promethus:
+              serviceMonitor:
+                enabled: true
+            
+            #######
+            # Native Routing
+            # Also loadBalancer.mode
+            #######
+            autoDirectNodeRoutes: true
+            enableEndpointRoutes: true
+            routingMode: native
+            ipv4NativeRoutingCIDR: 172.30.0.0/16
+            ######
+            # L2 Announcements
+            ######
+            l2announcements:
+              enabled: true
+              leaseDuration: 3s
+              leaseRenewDeadline: 1s
+              leaseRetryPeriod: 200ms
+            
+            k8sClientRateLimit:
+              qps: 100
+              burst: 200

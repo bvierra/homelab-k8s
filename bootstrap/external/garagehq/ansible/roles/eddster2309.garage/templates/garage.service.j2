@@ -1,0 +1,20 @@
+[Unit]
+Description=Garage Data Store
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Environment='GARAGE_CONFIG_FILE=/etc/garage.toml' 'RUST_LOG={{ garage_log_level }}' 'RUST_BACKTRACE=1'
+ExecStart={{ garage_binary }} server
+User={{ garage_user }}
+Group={{ garage_group }}
+PrivateTmp=yes
+RemoveIPC=yes
+ProtectSystem=strict
+ReadWritePaths={{ garage_data_directory }} {{ garage_metadata_directory }}
+ProtectHome=true
+NoNewPrivileges=true
+LimitNOFILE=42000
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,56 @@
+####################################################################################################################################################################
+# This task file is responsible for verifying that the required secrets for GarageHQ are defined and meet the expected format and length requirements.
+# It uses the assert module to check that each secret is defined and meets the expected criteria, and will fail with a descriptive error message if any of the checks fail.
+# This task should be run after the secrets have been retrieved from the External Secret Store (Infisical in this case) and set as facts.
+####################################################################################################################################################################
+
+- name: Create secret
+  ansible.builtin.shell: openssl rand -hex 24
+  register: value
+
+- name: DEBUG | Generated Secret
+  ansible.builtin.debug:
+    msg:
+      - "{{ value.stdout }}"
+      - "{{ value.stdout | length }}"
+
+- name: Verify External Secret RPC_SECRET is defined and == 64 characrers
+  ansible.builtin.assert:
+    that:
+      - secrets.RPC_SECRET is defined
+      - secrets.RPC_SECRET | length == 64
+    fail_msg: "RPC_SECRET is not set or its length is less than 64 characters. Length {{ secrets.RPC_SECRET | length }}."
+
+- name: Verify External Secret RPC_SECRET is of type hex
+  ansible.builtin.assert:
+    that:
+      - secrets.RPC_SECRET is ansible.builtin.regex("^[a-f0-9]+$")
+    fail_msg: "RPC_SECRET is not of type hex (only chars 0123456789abcdef are allowed)."
+
+- name: Verify External Secret ADMIN_TOKEN
+  ansible.builtin.assert:
+    that:
+      - secrets.ADMIN_TOKEN is defined
+      - secrets.ADMIN_TOKEN | length == 44
+    fail_msg: "ADMIN_TOKEN is not set or its length is less than 44 characters. Length {{ secrets.ADMIN_TOKEN | length }}"
+
+- name: Verify External Secret METRICS_TOKEN
+  ansible.builtin.assert:
+    that:
+      - secrets.METRICS_TOKEN is defined
+      - secrets.METRICS_TOKEN | length == 44
+    fail_msg: "METRICS_TOKEN is not set or its length is less than 44 characters. Length {{ secrets.METRICS_TOKEN | length }}"
+
+- name: Verify External Secret KEY_ID
+  ansible.builtin.assert:
+    that:
+      - secrets.KEY_ID is defined
+      - secrets.KEY_ID is ansible.builtin.regex("^GK[a-f0-9]{24}$")
+    fail_msg: "KEY_ID needs to be 24 characters long and start with 'GK'. Length {{ secrets.KEY_ID | length }}"
+
+- name: Verify External Secret KEY_SECRET
+  ansible.builtin.assert:
+    that:
+      - secrets.KEY_SECRET is defined
+      - secrets.KEY_SECRET | length == 64
+    fail_msg: "KEY_SECRET is not set or its length is not 64 characters. Length {{ secrets.KEY_SECRET | length }}"

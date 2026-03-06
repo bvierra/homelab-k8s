@@ -1,0 +1,89 @@
+# {{ ansible_managed }}
+
+client_max_body_size {{ garage_nginx_client_max_body_size }};
+
+upstream garage_s3_backend {
+    server 127.0.0.1:{{ garage_s3_port }} max_fails=3 fail_timeout=30s;
+    {% for server in ansible_play_hosts | reject('equalto', inventory_hostname) %}
+    server {{ hostvars[server]['ansible_default_ipv4']['address'] }}:{{ garage_s3_port }} max_fails=3 fail_timeout=30s;
+    {% endfor %}
+}
+
+upstream garage_web_backend {
+    server 127.0.0.1:{{ garage_web_port }} max_fails=3 fail_timeout=30s;
+    {% for server in ansible_play_hosts | reject('equalto', inventory_hostname) %}
+    server {{ hostvars[server]['ansible_default_ipv4']['address'] }}:{{ garage_web_port }} max_fails=3 fail_timeout=30s;
+    {% endfor %}
+}
+
+# Default route to destroy invalid requests
+server {
+    listen 80 default_server;
+    {% if garage_nginx_ssl_enabled %}
+    listen 443 default_server ssl;
+    {% endif %}
+
+    return 444;
+
+    {% if garage_nginx_ssl_enabled %}
+    ssl_ciphers aNULL;
+    ssl_certificate {{ garage_nginx_ssl_cert }};
+    ssl_certificate_key {{ garage_nginx_ssl_key }};
+    {% endif %}
+}
+
+{% if garage_nginx_ssl_enabled and garage_nginx_http_redirect_https %}
+# HTTP to HTTPS redirection
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name {{ garage_s3_root_domain }} *.{{ garage_s3_root_domain }}{% if garage_web_access_enabled %} {{ garage_web_root_domain }} *.{{ garage_web_root_domain }}{% endif %};
+
+    # Redirect all HTTP requests to HTTPS
+    return 301 https://$host$request_uri;
+}
+{% endif %}
+
+server {
+    listen 80;
+
+    server_name {{ garage_s3_root_domain }} *.{{ garage_s3_root_domain }};
+
+    location / {
+        proxy_pass http://garage_s3_backend;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        # Disable buffering to a temporary file.
+        proxy_max_temp_file_size 0;
+    }
+
+    {% if garage_nginx_ssl_enabled %}
+    # SSL
+    listen 443 ssl;
+    ssl_certificate {{ garage_nginx_ssl_cert }};
+    ssl_certificate_key {{ garage_nginx_ssl_key }};
+    {% endif %}
+}
+
+{% if garage_web_access_enabled %}
+server {
+    listen 80;
+
+    server_name {{ garage_web_root_domain }} *.{{ garage_web_root_domain }};
+
+    location / {
+        proxy_pass http://garage_web_backend;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+    }
+
+    {% if garage_nginx_ssl_enabled %}
+    # SSL
+    listen 443 ssl;
+    ssl_certificate {{ garage_nginx_ssl_cert }};
+    ssl_certificate_key {{ garage_nginx_ssl_key }};
+    {% endif %}
+}
+{% endif %}
+

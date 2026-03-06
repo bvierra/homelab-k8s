@@ -31,6 +31,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
     size = var.disk_size
     interface = "virtio0"
     file_format = "qcow2"
+    datastore_id  = var.storage_pool
   }
 
   initialization {

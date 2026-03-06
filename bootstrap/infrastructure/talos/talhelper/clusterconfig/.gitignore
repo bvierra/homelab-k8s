@@ -1,0 +1,8 @@
+k8s-cp01.yaml
+k8s-cp02.yaml
+k8s-cp03.yaml
+k8s-worker01.yaml
+k8s-worker02.yaml
+k8s-worker03.yaml
+k8s-worker04.yaml
+talosconfig

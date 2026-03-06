@@ -1,0 +1,9 @@
+- name: Restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+
+- name: Restart garage
+  ansible.builtin.systemd:
+    name: garage
+    state: restarted
