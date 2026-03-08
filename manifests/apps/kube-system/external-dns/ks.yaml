@@ -15,7 +15,7 @@ spec:
       name: *name
       namespace: *namespace
   interval: 1h
-  path: ./manifests/apps/kube-system/external-dns/app
+  path: ./apps/kube-system/external-dns/app
   postBuild:
     substituteFrom:
       - kind: ConfigMap
@@ -25,7 +25,7 @@ spec:
   prune: true
   retryInterval: 2m
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system
   targetNamespace: *namespace

@@ -8,10 +8,10 @@ metadata:
 spec:
   deletionPolicy: WaitForTermination
   interval: 1h
-  path: ./manifests/apps
+  path: ./apps
   prune: true
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system
   wait: false

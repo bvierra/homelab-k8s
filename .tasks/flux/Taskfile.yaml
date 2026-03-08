@@ -5,6 +5,12 @@ set: [pipefail]
 tasks:
   default: task --list
 
+  create-artifact:
+    desc: Create an OCI artifact for manifests and upload to a registry, useful for development and testing
+    cmds:
+      - flux push artifact oci://{{.OCI_REGISTRY}}/{{.OCI_ARTIFACT_NAME}}:$(git rev-parse --short HEAD) --path={{.MANIFESTS_DIR}} --source="$(git config --get remote.origin.url)" --revision="$(git branch --show-current)/$(git rev-parse HEAD)"
+      - flux tag artifact oci://{{.OCI_REGISTRY}}/{{.OCI_ARTIFACT_NAME}}:$(git rev-parse --short HEAD) --tag latest
+
   reconcile:
     desc: Force Flux to pull in changes from your Git repository
     cmd: flux --namespace flux-system reconcile kustomization flux-instance --with-source

@@ -13,9 +13,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/external-secrets/external-secrets/app
+  path: ./apps/external-secrets/external-secrets/app
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system
   targetNamespace: external-secrets

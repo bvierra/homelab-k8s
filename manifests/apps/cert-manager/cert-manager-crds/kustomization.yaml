@@ -13,8 +13,8 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/cert-manager/cert-manager-crds/base
+  path: ./apps/cert-manager/cert-manager-crds/base
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system

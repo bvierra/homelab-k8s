@@ -6,13 +6,19 @@ shopt: [globstar]
 
 includes:
   proxmox:
-    taskfile: ./bootstrap/tofu/talos/Taskfile.yaml
-    dir: ./bootstrap/tofu/talos
+    taskfile: ./bootstrap/infrastructure/talos/proxmox/Taskfile.yaml
+    dir: ./bootstrap/infrastructure/talos/proxmox
   talos:
-    taskfile: ./bootstrap/talos/Taskfile.yaml
-    dir: ./bootstrap/talos
+    taskfile: ./bootstrap/infrastructure/talos/talhelper/Taskfile.yaml
+    dir: ./bootstrap/infrastructure/talos/talhelper
   flux:
     taskfile: .tasks/flux/Taskfile.yaml
+  garagehq:
+    taskfile: ./bootstrap/external/garagehq/tofu/Taskfile.yaml
+    dir: ./bootstrap/external/garagehq/tofu/
+
+dotenv:
+  - ".env"
 
 env:
   KUBECONFIG: "{{ .HOME }}/.kube/config"
@@ -21,6 +27,7 @@ vars:
   MANIFESTS_DIR: "{{ .ROOT_DIR }}/manifests"
   SOPS_SERVER_AGE_KEY_FILE: "{{ .ROOT_DIR }}/artifacts/sops/server/server.privkey"
   SOPS_AGE_KEY_FILE: "{{ .ROOT_DIR }}/artifacts/sops/user/user.privkey"
+  OCI_ARTIFACT_NAME: "flux-manifests"
 
 tasks:
   default: task --list

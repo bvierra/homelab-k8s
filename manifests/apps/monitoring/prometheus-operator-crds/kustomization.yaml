@@ -13,8 +13,8 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/monitoring/prometheus-operator-crds/app/
+  path: ./apps/monitoring/prometheus-operator-crds/app/
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system

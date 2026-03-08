@@ -13,9 +13,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/monitoring/vmcluster-configs/base/
+  path: ./apps/monitoring/vmcluster-configs/base/
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system
   postBuild:

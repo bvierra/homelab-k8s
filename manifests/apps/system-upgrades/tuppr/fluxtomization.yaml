@@ -13,9 +13,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: kubernetes-reflector
-  path: ./manifests/apps/system-upgrades/kubernetes-reflector/base
+  path: ./apps/system-upgrades/kubernetes-reflector/base
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: tuppr
     namespace: system-upgrades
   healthChecks:

@@ -13,9 +13,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: democratic-csi
-  path: ./manifests/apps/democratic-csi/democratic-csi/app/
+  path: ./apps/democratic-csi/democratic-csi/app/
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system
   healthChecks:

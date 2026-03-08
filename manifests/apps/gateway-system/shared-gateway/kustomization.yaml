@@ -10,7 +10,7 @@ spec:
     labels:
       app.kubernetes.io/name: *name
   interval: 1h
-  path: ./manifests/apps/gateway-system/shared-gateway/configs
+  path: ./apps/gateway-system/shared-gateway/configs
   postBuild:
     substituteFrom:
       - kind: ConfigMap
@@ -23,7 +23,7 @@ spec:
   prune: true
   retryInterval: 2m
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system
   targetNamespace: *namespace

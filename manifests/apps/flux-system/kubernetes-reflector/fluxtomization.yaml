@@ -13,9 +13,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: kubernetes-reflector
-  path: ./manifests/apps/flux-system/kubernetes-reflector/app
+  path: ./apps/flux-system/kubernetes-reflector/app
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system
   healthChecks:

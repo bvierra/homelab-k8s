@@ -13,9 +13,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/flux-system/kustomize-mutating-webhook/app/
+  path: ./apps/flux-system/kustomize-mutating-webhook/app/
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: *ns
   dependsOn:

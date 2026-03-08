@@ -13,8 +13,8 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/monitoring/vm-operator/base/
+  path: ./apps/monitoring/vm-operator/base/
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system

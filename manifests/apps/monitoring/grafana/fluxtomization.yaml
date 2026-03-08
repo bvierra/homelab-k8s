@@ -13,8 +13,8 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *name
-  path: ./manifests/apps/monitoring/grafana/base/
+  path: ./apps/monitoring/grafana/base/
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system

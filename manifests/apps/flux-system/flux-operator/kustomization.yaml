@@ -6,10 +6,10 @@ metadata:
   name: flux-operator
 spec:
   interval: 1h
-  path: ./manifests/apps/flux-system/flux-operator/app
+  path: ./apps/flux-system/flux-operator/app
   prune: true
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: homelab
     namespace: flux-system
   targetNamespace: flux-system
