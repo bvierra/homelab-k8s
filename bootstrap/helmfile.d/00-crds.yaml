@@ -21,7 +21,7 @@ releases:
   - name: grafana-operator-crds
     namespace: monitoring
     chart: oci://ghcr.io/grafana/helm-charts/grafana-operator
-    version: 5.22.0
+    version: 5.22.1
 
   - name: prometheus-operator-crds
     namespace: monitoring
