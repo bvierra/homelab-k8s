@@ -10,7 +10,7 @@ jobs:
         # of macos image with nested virt + vagrant
         tox: ["lint"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: Install dependencies
         run: |
           sudo apt install tox
